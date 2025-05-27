@@ -1,0 +1,19 @@
+
+name: Build and test
+
+on:
+  pull_request:
+    branches: [ master, main ]
+    paths-ignore:
+      - 'README.md'
+  push:
+    branches: [ master, main ]
+    paths-ignore:
+      - 'README.md'
+
+jobs:
+  build-and-test:
+    uses: ./.github/workflows/build-and-test-main.yml
+    with:
+      client-only: true
+    secrets: inherit

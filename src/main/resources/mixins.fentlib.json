@@ -1,0 +1,11 @@
+{
+  "required": true,
+  "minVersion": "0.8.7-GTNH",
+  "package": "org.fentanylsolutions.fentlib.mixins.mid",
+  "refmap": "mixins.fentlib.refmap.json",
+  "target": "@env(DEFAULT)",
+  "compatibilityLevel": "JAVA_8",
+  "client" : [
+
+  ]
+}
