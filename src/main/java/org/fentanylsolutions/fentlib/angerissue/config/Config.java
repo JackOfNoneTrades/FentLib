@@ -33,6 +33,6 @@ public class Config {
          * AngerIssue.varInstanceCommon.updateAffectedMobs();
          */
 
-        //TODO: rename main to master
+        // TODO: rename main to master
     }
 }
