@@ -11,12 +11,12 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 
 @Mod(
-    modid = Fentlib.MODID,
+    modid = FentLib.MODID,
     version = Tags.VERSION,
-    name = "Fentlib",
+    name = "FentLib",
     acceptedMinecraftVersions = "[1.7.10]",
     dependencies = "after:carbonconfig")
-public class Fentlib {
+public class FentLib {
 
     public static final String MODID = "fentlib";
     public static final String MODGROUP = "org.fentanylsolutions";

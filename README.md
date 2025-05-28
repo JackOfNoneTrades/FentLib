@@ -1,14 +1,14 @@
-# Fentlib
+# FentLib
 A shared code library and fix mod.
 
 ![logo](images/logo_small.png)
 
 ## Features
-* Currently fixes 1.7.10 `Carbon Config` array serialization, addressing [this issue](https://github.com/Carbon-Config-Project/CarbonConfigLib/issues/5).
+* Currently fixes `1.7.10` `Carbon Config` array serialization, addressing [this issue](https://github.com/Carbon-Config-Project/CarbonConfigLib/issues/5).
 * Java annotation system for `Carbon Config`. Example usage:
 
 ```java
-@FentConfig(name = "testfentconf")
+@FentConfig(name = "testconf")
 public class TestConf {
 
     @ConfigInt(
@@ -23,8 +23,8 @@ public class TestConf {
 ```
 
 ## Downloads
-* [CurseForge ![curse](images/icons/curse.png)](https://www.curseforge.com/minecraft/mc-mods/fentlib)
-* [Modrinth ![modrinth](images/icons/modrinth.png)](https://modrinth.com/mod/fentlib)
+<!--* [CurseForge ![curse](images/icons/curse.png)](https://www.curseforge.com/minecraft/mc-mods/fentlib)
+* [Modrinth ![modrinth](images/icons/modrinth.png)](https://modrinth.com/mod/fentlib)-->
 * [Git ![git](images/icons/git.png)](https://github.com/JackOfNoneTrades/Fentlib/releases)
 
 ## Dependencies

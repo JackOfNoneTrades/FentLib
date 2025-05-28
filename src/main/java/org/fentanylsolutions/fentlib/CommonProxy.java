@@ -15,7 +15,7 @@ public class CommonProxy {
     public void preInit(FMLPreInitializationEvent event) {
         Config.synchronizeConfiguration(event.getSuggestedConfigurationFile());
 
-        Fentlib.LOG.info("I am Fentlib at version " + Tags.VERSION);
+        FentLib.LOG.info("I am Fentlib at version " + Tags.VERSION);
     }
 
     // load "Do your mod setup. Build whatever data structures you care about. Register recipes." (Remove if not needed)

@@ -1,6 +1,6 @@
 package org.fentanylsolutions.fentlib.mixins.early.carbonconfig;
 
-import org.fentanylsolutions.fentlib.Fentlib;
+import org.fentanylsolutions.fentlib.FentLib;
 import org.fentanylsolutions.fentlib.mixininterfaces.IConfigMixin;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -23,7 +23,7 @@ public class EventHandlerMixin {
             target = "Lcpw/mods/fml/common/Loader;activeModContainer()Lcpw/mods/fml/common/ModContainer;"))
     private ModContainer redirectActiveModContainer(Loader loader, ConfigHandler config) {
         String modid = ((IConfigMixin) config.getConfig()).getRealOwnerId();
-        Fentlib.LOG.info("Redirected Loader.activeModContainer() [{}]", modid);
+        FentLib.LOG.info("Redirected Loader.activeModContainer() [{}]", modid);
         if (modid == null) {
             return loader.activeModContainer();
         } else {

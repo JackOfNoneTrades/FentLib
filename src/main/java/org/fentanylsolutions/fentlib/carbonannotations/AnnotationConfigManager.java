@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.fentanylsolutions.fentlib.Fentlib;
+import org.fentanylsolutions.fentlib.FentLib;
 import org.fentanylsolutions.fentlib.mixininterfaces.IConfigMixin;
 import org.fentanylsolutions.fentlib.util.ClassUtil;
 import org.reflections.Reflections;
@@ -57,14 +57,14 @@ public class AnnotationConfigManager {
 
         for (Class<?> configClass : configClasses) {
             try {
-                Fentlib.LOG.info("Found class " + configClass.getCanonicalName() + " annotated with @FentConfig");
+                FentLib.LOG.info("Found class " + configClass.getCanonicalName() + " annotated with @FentConfig");
                 registerConfigClass(configClass);
             } catch (Exception e) {
-                Fentlib.LOG.error("Failed to register config class: " + configClass.getName(), e);
+                FentLib.LOG.error("Failed to register config class: " + configClass.getName(), e);
             }
         }
 
-        Fentlib.LOG.info("Registered {} config classes", registeredConfigs.size());
+        FentLib.LOG.info("Registered {} config classes", registeredConfigs.size());
     }
 
     /**
@@ -101,7 +101,7 @@ public class AnnotationConfigManager {
 
         // Add load listener to sync values back to fields
         config.addLoadedListener(() -> {
-            Fentlib.LOG.info("Config loaded: {}, syncing values", configAnnotation.name());
+            FentLib.LOG.info("Config loaded: {}, syncing values", configAnnotation.name());
             syncConfigToFields(configInstance, fieldEntries);
         });
 
@@ -110,7 +110,7 @@ public class AnnotationConfigManager {
         // Store reference
         registeredConfigs.add(new ConfigContainer(configInstance, config, fieldEntries));
 
-        Fentlib.LOG.debug("Registered config: {}", configAnnotation.name());
+        FentLib.LOG.debug("Registered config: {}", configAnnotation.name());
     }
 
     /**
@@ -339,7 +339,7 @@ public class AnnotationConfigManager {
                     field.set(configInstance, parsedArray);
                 }
             } catch (IllegalAccessException e) {
-                Fentlib.LOG.error("Failed to sync field: " + field.getName(), e);
+                FentLib.LOG.error("Failed to sync field: " + field.getName(), e);
             } catch (InvocationTargetException | InstantiationException | NoSuchMethodException e) {
                 throw new RuntimeException(e);
             }
