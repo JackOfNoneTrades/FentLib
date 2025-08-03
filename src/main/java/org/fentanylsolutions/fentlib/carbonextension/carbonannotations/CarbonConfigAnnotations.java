@@ -1,4 +1,4 @@
-package org.fentanylsolutions.fentlib.carbonannotations;
+package org.fentanylsolutions.fentlib.carbonextension.carbonannotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -13,6 +13,14 @@ public class CarbonConfigAnnotations {
 
         String name();
     }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.METHOD)
+    public @interface FentConfigOnSync {}
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.METHOD)
+    public @interface FentConfigOnCreate {}
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
@@ -50,6 +58,29 @@ public class CarbonConfigAnnotations {
         int min() default Integer.MIN_VALUE;
 
         int max() default Integer.MAX_VALUE;
+
+        String category();
+
+        boolean clientSynced() default false;
+
+        boolean requiresGameReload() default false;
+
+        boolean requiresWorldReload() default false;
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.FIELD)
+    public @interface ConfigDouble {
+
+        String name();
+
+        String comment() default "";
+
+        double defaultValue();
+
+        double min() default Double.MIN_VALUE;
+
+        double max() default Double.MAX_VALUE;
 
         String category();
 

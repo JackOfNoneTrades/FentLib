@@ -6,6 +6,7 @@ import java.util.Map;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.IChatComponent;
 
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
@@ -21,81 +22,87 @@ import carbonconfiglib.gui.widgets.Icon;
 import carbonconfiglib.gui.widgets.screen.IWidget;
 
 @SuppressWarnings("unused")
-@Mixin(ConfigElement.class)
+@Mixin(value = ConfigElement.class, remap = false)
 public abstract class ConfigElementMixin extends Element {
 
     public ConfigElementMixin(IChatComponent name) {
         super(name);
     }
 
-    @Shadow(remap = false)
+    @Shadow
     protected abstract boolean isArray();
 
-    @Shadow(remap = false)
+    @Shadow
     protected abstract boolean isCompound();
 
-    @Shadow(remap = false)
+    @Shadow
     protected IValueNode value;
 
-    @Shadow(remap = false)
+    @Final
+    @Shadow
     private static IChatComponent RELOAD;
 
-    @Shadow(remap = false)
+    @Final
+    @Shadow
     private static IChatComponent RESTART;
 
-    @Shadow(remap = false)
+    @Final
+    @Shadow
     private static IChatComponent DELETE;
 
-    @Shadow(remap = false)
+    @Final
+    @Shadow
     private static IChatComponent REVERT;
 
-    @Shadow(remap = false)
+    @Final
+    @Shadow
     private static IChatComponent DEFAULT;
 
-    @Shadow(remap = false)
+    @Final
+    @Shadow
     private static IChatComponent SUGGESTIONS;
 
-    @Shadow(remap = false)
+    @Shadow
     protected abstract boolean renderChildren();
 
-    @Shadow(remap = false)
+    @Shadow
     protected CarbonHoverIconButton moveUp;
 
-    @Shadow(remap = false)
+    @Shadow
     protected abstract boolean canMoveUp();
 
-    @Shadow(remap = false)
+    @Shadow
     protected CarbonHoverIconButton moveDown;
 
-    @Shadow(remap = false)
+    @Shadow
     protected abstract boolean canMoveDown();
 
-    @Shadow(remap = false)
+    @Shadow
     protected List<Map.Entry<IWidget, ConfigElement.AlignOffset>> mappedListeners;
 
-    @Shadow(remap = false)
+    @Shadow
     protected abstract int getMaxX(int prevMaxX);
 
-    @Shadow(remap = false)
+    @Shadow
     protected abstract int indexOf();
 
-    @Shadow(remap = false)
+    @Shadow
     protected CarbonIconButton setReset;
 
-    @Shadow(remap = false)
+    @Shadow
     protected CarbonIconButton setDefault;
 
-    @Shadow(remap = false)
+    @Shadow
     protected CarbonIconButton suggestion;
 
-    @Shadow(remap = false)
+    @Shadow
     protected abstract boolean hasSuggestions();
 
     /**
      * @author jack
      * @reason Fixes array tooltips not rendering
      */
-    @Overwrite(remap = false)
+    @Overwrite
     public void render(int x, int top, int left, int width, int height, int mouseX, int mouseY, boolean selected,
         float partialTicks) {
         if (((ConfigElementAccessor) this).invokeRenderName() && !isArray()) {

@@ -1,8 +1,9 @@
-package org.fentanylsolutions.fentlib.carbonannotations;
+package org.fentanylsolutions.fentlib.carbonextension.carbonannotations;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -94,7 +95,7 @@ public class AnnotationConfigManager {
 
         // Process fields
         Map<Field, ConfigEntry<?>> fieldEntries = new HashMap<>();
-        processConfigFields(configClass, carbonConf, fieldEntries, configAnnotation.name());
+        processConfigFields(configClass, carbonConf, fieldEntries);
 
         // Create and register the config
         ConfigHandler config = CarbonConfig.CONFIGS.createConfig(carbonConf);
@@ -104,6 +105,23 @@ public class AnnotationConfigManager {
             FentLib.LOG.info("Config loaded: {}, syncing values", configAnnotation.name());
             syncConfigToFields(configInstance, fieldEntries);
         });
+
+        for (Method method : configClass.getDeclaredMethods()) {
+            method.setAccessible(true);
+            if (method.isAnnotationPresent(CarbonConfigAnnotations.FentConfigOnSync.class)) {
+                config.addLoadedListener(() -> {
+                    try {
+                        method.invoke(null);
+                    } catch (IllegalAccessException | InvocationTargetException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+            }
+
+            if (method.isAnnotationPresent(CarbonConfigAnnotations.FentConfigOnCreate.class)) {
+                method.invoke(null, carbonConf);
+            }
+        }
 
         config.register();
 
@@ -117,17 +135,19 @@ public class AnnotationConfigManager {
      * Processes all annotated fields in a config class
      */
     private static void processConfigFields(Class<?> configClass, carbonconfiglib.config.Config carbonConf,
-        Map<Field, ConfigEntry<?>> fieldEntries, String configName) {
+        Map<Field, ConfigEntry<?>> fieldEntries) {
 
         for (Field field : configClass.getDeclaredFields()) {
             field.setAccessible(true);
 
             if (field.isAnnotationPresent(CarbonConfigAnnotations.ConfigInt.class)) {
-                processIntField(field, carbonConf, fieldEntries, configName);
+                processIntField(field, carbonConf, fieldEntries);
             } else if (field.isAnnotationPresent(CarbonConfigAnnotations.ConfigBool.class)) {
-                processBoolField(field, carbonConf, fieldEntries, configName);
+                processBoolField(field, carbonConf, fieldEntries);
+            } else if (field.isAnnotationPresent(CarbonConfigAnnotations.ConfigDouble.class)) {
+                processDoubleField(field, carbonConf, fieldEntries);
             } else if (field.isAnnotationPresent(CarbonConfigAnnotations.ConfigArray.class)) {
-                processArrayField(field, carbonConf, fieldEntries, configName);
+                processArrayField(field, carbonConf, fieldEntries);
             }
 
         }
@@ -137,11 +157,11 @@ public class AnnotationConfigManager {
      * Processes a field annotated with @ConfigInt
      */
     private static void processIntField(Field field, carbonconfiglib.config.Config carbonConf,
-        Map<Field, ConfigEntry<?>> fieldEntries, String configName) {
+        Map<Field, ConfigEntry<?>> fieldEntries) {
         CarbonConfigAnnotations.ConfigInt annotation = field.getAnnotation(CarbonConfigAnnotations.ConfigInt.class);
 
         // Get or create category section with proper namespacing
-        ConfigSection section = getOrCreateSection(carbonConf, annotation.category(), configName);
+        ConfigSection section = getOrCreateSection(carbonConf, annotation.category());
 
         // Create config entry
         ConfigEntry.IntValue entry = section.addInt(annotation.name(), annotation.defaultValue());
@@ -179,12 +199,56 @@ public class AnnotationConfigManager {
         fieldEntries.put(field, entry);
     }
 
+    private static void processDoubleField(Field field, carbonconfiglib.config.Config carbonConf,
+        Map<Field, ConfigEntry<?>> fieldEntries) {
+        CarbonConfigAnnotations.ConfigDouble annotation = field
+            .getAnnotation(CarbonConfigAnnotations.ConfigDouble.class);
+
+        // Get or create category section with proper namespacing
+        ConfigSection section = getOrCreateSection(carbonConf, annotation.category());
+
+        // Create config entry
+        ConfigEntry.DoubleValue entry = section.addDouble(annotation.name(), annotation.defaultValue());
+
+        // Set properties
+        if (!annotation.comment()
+            .isEmpty()) {
+            entry.setComment(annotation.comment());
+        }
+
+        if (annotation.min() != Double.MIN_VALUE || annotation.max() != Double.MAX_VALUE) {
+            entry.setRange(annotation.min(), annotation.max());
+        }
+
+        if (annotation.min() != Double.MIN_VALUE) {
+            entry.setMin(annotation.min());
+        }
+
+        if (annotation.max() != Double.MAX_VALUE) {
+            entry.setMax(annotation.max());
+        }
+
+        if (annotation.clientSynced()) {
+            entry.setClientSynced();
+        }
+
+        if (annotation.requiresGameReload()) {
+            entry.setRequiredReload(ReloadMode.GAME);
+        }
+
+        if (annotation.requiresWorldReload()) {
+            entry.setRequiredReload(ReloadMode.WORLD);
+        }
+
+        fieldEntries.put(field, entry);
+    }
+
     private static void processBoolField(Field field, carbonconfiglib.config.Config carbonConf,
-        Map<Field, ConfigEntry<?>> fieldEntries, String configName) {
+        Map<Field, ConfigEntry<?>> fieldEntries) {
         CarbonConfigAnnotations.ConfigBool annotation = field.getAnnotation(CarbonConfigAnnotations.ConfigBool.class);
 
         // Get or create category section with proper namespacing
-        ConfigSection section = getOrCreateSection(carbonConf, annotation.category(), configName);
+        ConfigSection section = getOrCreateSection(carbonConf, annotation.category());
 
         // Create config entry
         ConfigEntry.BoolValue entry = section.addBool(annotation.name(), annotation.defaultValue());
@@ -211,10 +275,10 @@ public class AnnotationConfigManager {
     }
 
     private static void processArrayField(Field field, carbonconfiglib.config.Config carbonConf,
-        Map<Field, ConfigEntry<?>> fieldEntries, String configName) {
+        Map<Field, ConfigEntry<?>> fieldEntries) {
 
         CarbonConfigAnnotations.ConfigArray annotation = field.getAnnotation(CarbonConfigAnnotations.ConfigArray.class);
-        ConfigSection section = getOrCreateSection(carbonConf, annotation.category(), configName);
+        ConfigSection section = getOrCreateSection(carbonConf, annotation.category());
 
         Class<? extends IArraySerializer<?>> serializerClass;
 
@@ -276,9 +340,8 @@ public class AnnotationConfigManager {
     /**
      * Gets or creates a config section for a category
      */
-    private static ConfigSection getOrCreateSection(carbonconfiglib.config.Config carbonConf, String category,
-        String configName) {
-        String key = configName + ":" + category;
+    public static ConfigSection getOrCreateSection(carbonconfiglib.config.Config carbonConf, String category) {
+        String key = carbonConf.getName() + ":" + category;
         return categorySections.computeIfAbsent(key, k -> carbonConf.add(category));
     }
 
@@ -313,6 +376,13 @@ public class AnnotationConfigManager {
                     if (elementType == String.class) {
                         parsedArray = rawValues;
                     } else {
+                        if (elementType == int.class) {
+                            serializerClass = Serializers.IntSerializer.class;
+                        } else if (elementType == double.class) {
+                            serializerClass = Serializers.DoubleSerializer.class;
+                        } else if (elementType == boolean.class) {
+                            serializerClass = Serializers.BooleanSerializer.class;
+                        }
                         IArraySerializer<Object> serializer = (IArraySerializer<Object>) serializerClass
                             .getDeclaredConstructor()
                             .newInstance();

@@ -36,5 +36,8 @@
 dependencies {
     runtimeOnlyNonPublishable("com.github.GTNewHorizons:NotEnoughItems:2.7.4-GTNH:dev")
     api(rfg.deobf("maven.modrinth:carbon-config:ttXTOUmO"))
+    api("com.github.GTNewHorizons:ModularUI2:2.2.15-1.7.10:dev")
+    //api("carbonconfiglib:CarbonConfig-1.7.10:1.2.4-fent:deobf")
     shadowCompile('org.reflections:reflections:0.10.2')
+    runtimeOnlyNonPublishable(rfg.deobf('curse.maven:witchery-69673:2234410'))
 }

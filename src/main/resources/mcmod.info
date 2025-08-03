@@ -3,7 +3,7 @@
 	"modList": [{
 		"modid": "${modId}",
 		"name": "${modName}",
-		"description": "A library and fix mod made by jack.",
+		"description": "A library and fix mod made by jack. Powered by French rap.",
 		"version": "${modVersion}",
 		"mcversion": "${minecraftVersion}",
 		"url": "https://github.com/JackOfNoneTrades/FentLib",

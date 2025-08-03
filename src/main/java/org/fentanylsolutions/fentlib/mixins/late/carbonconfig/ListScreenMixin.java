@@ -1,14 +1,22 @@
 package org.fentanylsolutions.fentlib.mixins.late.carbonconfig;
 
+import com.cleanroommc.modularui.factory.ClientGUI;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiButton;
 import net.minecraft.util.ResourceLocation;
 
+import org.fentanylsolutions.fentlib.chadconfig.TestGui;
+import org.fentanylsolutions.fentlib.util.MobUtil;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import carbonconfiglib.gui.config.ListScreen;
 import carbonconfiglib.gui.screen.ConfigScreen;
 import carbonconfiglib.gui.screen.ConfigSelectorScreen;
+import carbonconfiglib.gui.widgets.CarbonButton;
 import carbonconfiglib.gui.widgets.GuiUtils;
 import carbonconfiglib.gui.widgets.Icon;
 
@@ -83,4 +91,31 @@ public class ListScreenMixin {
      * }
      * }
      */
+
+    private static final int CUSTOM_BUTTON_ID = 696969;
+
+    private void onPress(GuiButton button) {
+        MobUtil.printMobNames();
+        ClientGUI.open(TestGui.createGUI());
+    }
+
+    @Inject(method = "initGui", at = @At("TAIL"), remap = false)
+    private void onInitGui(CallbackInfo ci) {
+        if ((Object) this instanceof ConfigSelectorScreen) {
+            if (((ConfigSelectorScreenAccessor) this).getModName()
+                .getUnformattedText()
+                .equals("Fentlib")) {
+
+                String buttonText = "Print Mob Classes";
+                ((ListScreen) (Object) this).addWidget(
+                    new CarbonButton(
+                        30,
+                        500,
+                        Minecraft.getMinecraft().fontRenderer.getStringWidth(buttonText),
+                        20,
+                        buttonText,
+                        this::onPress));
+            }
+        }
+    }
 }

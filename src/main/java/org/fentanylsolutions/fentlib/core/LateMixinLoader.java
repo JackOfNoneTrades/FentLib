@@ -36,7 +36,16 @@ public class LateMixinLoader implements ILateMixinLoader {
                     mixins.add("carbonconfig.ConfigElementAccessor");
                     mixins.add("carbonconfig.ElementAccessor");
                     mixins.add("carbonconfig.ConfigElementMixin");
-                    mixins.add("carbonconfig.CarbonConfigMixin");
+                    mixins.add("carbonconfig.RegistryValueAccessor");
+                    mixins.add("carbonconfig.RegistryValue_RegistrySuggestionsMixin");
+                    mixins.add("carbonconfig.RegistryValueMixin");
+                }
+            }
+
+            if (Config.disableDefaultCarbonHijack) {
+                if (FMLLaunchHandler.side()
+                    .isClient()) {
+                    mixins.add("carbonconfig.DisableHijackMixin");
                 }
             }
 
@@ -45,10 +54,13 @@ public class LateMixinLoader implements ILateMixinLoader {
                 mixins.add("carbonconfig.ListScreenMixin");
                 mixins.add("carbonconfig.ConfigSelectorScreenAccessor");
                 mixins.add("carbonconfig.ConfigScreenAccessor");
+                mixins.add("carbonconfig.MixinSuggestionRenderers");
             }
 
             mixins.add("carbonconfig.ConfigMixin");
         }
+
+        //mixins.add("fml.GameDataAccessor");
         return mixins;
     }
 }

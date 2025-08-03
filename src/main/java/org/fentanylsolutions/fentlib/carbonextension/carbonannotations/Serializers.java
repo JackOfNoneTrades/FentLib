@@ -1,4 +1,4 @@
-package org.fentanylsolutions.fentlib.carbonannotations;
+package org.fentanylsolutions.fentlib.carbonextension.carbonannotations;
 
 public class Serializers {
 

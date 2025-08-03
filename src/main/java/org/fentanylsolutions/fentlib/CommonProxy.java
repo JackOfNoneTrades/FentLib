@@ -1,12 +1,15 @@
 package org.fentanylsolutions.fentlib;
 
-import org.fentanylsolutions.fentlib.carbonannotations.AnnotationConfigManager;
+import net.minecraft.entity.player.EntityPlayer;
+
+import org.fentanylsolutions.fentlib.carbonextension.carbonannotations.AnnotationConfigManager;
 
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
+import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 
 public class CommonProxy {
 
@@ -20,6 +23,7 @@ public class CommonProxy {
 
     // load "Do your mod setup. Build whatever data structures you care about. Register recipes." (Remove if not needed)
     public void init(FMLInitializationEvent event) {
+        FentLib.varInstanceCommon.initHook();
         // Config.registerConfig();
         if (Loader.isModLoaded("carbonconfig")) {
             AnnotationConfigManager.scanAndRegisterConfigs();
@@ -27,8 +31,14 @@ public class CommonProxy {
     }
 
     // postInit "Handle interaction with other mods, complete your setup based on this." (Remove if not needed)
-    public void postInit(FMLPostInitializationEvent event) {}
+    public void postInit(FMLPostInitializationEvent event) {
+        FentLib.varInstanceCommon.postInitHook();
+    }
 
     // register server commands in this event handler (Remove if not needed)
     public void serverStarting(FMLServerStartingEvent event) {}
+
+    public EntityPlayer getPlayerEntityFromContext(MessageContext ctx) {
+        return ctx.getServerHandler().playerEntity;
+    }
 }

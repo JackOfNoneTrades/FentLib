@@ -24,11 +24,20 @@ public class EarlyMixinLoader implements IEarlyMixinLoader, IFMLLoadingPlugin {
         final List<String> mixins = new ArrayList<>();
         if (FMLLaunchHandler.side()
             .isClient()) {
-            // mixins.add("minecraft.MixinGuiMultiplayer");
+            mixins.add("minecraft.GuiScreenAccessor");
 
             // Looks like mixins targeting Event Handlers need to be loaded early
             mixins.add("carbonconfig.EventHandlerMixin");
         }
+
+        mixins.add("minecraftforge.DimensionManagerAccessor");
+        mixins.add("fml.FMLControlledNamespacedRegistryAccessor");
+        mixins.add("fml.RegistryDelegate_DelegateAccessor");
+
+        mixins.add("minecraft.EntityListAccessor");
+        mixins.add("minecraft.RegistryNamespacedAccessor");
+        mixins.add("minecraft.EntityLivingBaseMixin");
+        mixins.add("minecraft.GameProfileAccessor");
 
         return mixins;
     }

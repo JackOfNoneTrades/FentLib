@@ -1,7 +1,10 @@
 package org.fentanylsolutions.fentlib;
 
+import cpw.mods.fml.common.Loader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.fentanylsolutions.fentlib.varinstances.VarInstanceClient;
+import org.fentanylsolutions.fentlib.varinstances.VarInstanceCommon;
 
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.SidedProxy;
@@ -21,6 +24,11 @@ public class FentLib {
     public static final String MODID = "fentlib";
     public static final String MODGROUP = "org.fentanylsolutions";
     public static final Logger LOG = LogManager.getLogger(MODID);
+
+    public static VarInstanceClient varInstanceClient = new VarInstanceClient();
+    public static VarInstanceCommon varInstanceCommon = new VarInstanceCommon();
+
+    public static boolean carbonConfigLoaded = Loader.isModLoaded("carbonconfig");
 
     @SidedProxy(
         clientSide = MODGROUP + "." + MODID + ".ClientProxy",
@@ -51,4 +59,7 @@ public class FentLib {
     public void serverStarting(FMLServerStartingEvent event) {
         proxy.serverStarting(event);
     }
+
+    // TODO: Fix main menu picking up clicks made during load
+    // TODO: Fix config buttons not making sounds
 }

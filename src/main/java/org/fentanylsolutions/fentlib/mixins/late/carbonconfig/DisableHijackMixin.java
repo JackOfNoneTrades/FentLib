@@ -11,7 +11,7 @@ import carbonconfiglib.impl.ReloadMode;
 
 @SuppressWarnings("unused")
 @Mixin(CarbonConfig.class)
-public class CarbonConfigMixin {
+public class DisableHijackMixin {
 
     @Redirect(
         method = "onPreInit",
@@ -22,7 +22,6 @@ public class CarbonConfigMixin {
     private ConfigEntry.BoolValue redirectAddBool(ConfigSection section, String key, boolean defaultValue,
         String[] comments) {
         if ("force-forge-support".equals(key)) {
-            System.out.println("Applied mixin bruv");
             return section.addBool(key, false, comments)
                 .setRequiredReload(ReloadMode.GAME);
         }
