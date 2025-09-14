@@ -1,22 +1,21 @@
 package org.fentanylsolutions.fentlib.core;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
-
-import org.fentanylsolutions.fentlib.Config;
 
 import com.gtnewhorizon.gtnhmixins.ILateMixinLoader;
 import com.gtnewhorizon.gtnhmixins.LateMixin;
 
-import cpw.mods.fml.common.Loader;
-import cpw.mods.fml.relauncher.FMLLaunchHandler;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
 
 @SuppressWarnings("unused")
 @LateMixin
 @IFMLLoadingPlugin.MCVersion("1.7.10")
 public class LateMixinLoader implements ILateMixinLoader {
+
+    private final List<String> specialIds = Arrays.asList("fml", "mcp", "minecraft", "minecraftforge");
 
     @Override
     public String getMixinConfig() {
@@ -26,29 +25,24 @@ public class LateMixinLoader implements ILateMixinLoader {
     @Override
     public List<String> getMixins(Set<String> loadedCoreMods) {
         final List<String> mixins = new ArrayList<>();
-        if (Loader.isModLoaded("carbonconfig")) {
-            if (Config.carbonConfigFixes) {
-                mixins.add("carbonconfig.HelpersMixin");
-                if (FMLLaunchHandler.side()
-                    .isClient()) {
-                    mixins.add("carbonconfig.ArrayElementAccessor");
-                    mixins.add("carbonconfig.AlignOffsetAccessor");
-                    mixins.add("carbonconfig.ConfigElementAccessor");
-                    mixins.add("carbonconfig.ElementAccessor");
-                    mixins.add("carbonconfig.ConfigElementMixin");
-                    mixins.add("carbonconfig.CarbonConfigMixin");
-                }
-            }
 
-            if (FMLLaunchHandler.side()
-                .isClient()) {
-                mixins.add("carbonconfig.ListScreenMixin");
-                mixins.add("carbonconfig.ConfigSelectorScreenAccessor");
-                mixins.add("carbonconfig.ConfigScreenAccessor");
-            }
+        /*
+         * Reflections reflections = new Reflections(
+         * new ConfigurationBuilder().setUrls(ClasspathHelper.forClassLoader())
+         * .setScanners(Scanners.TypesAnnotated));
+         * Set<Class<?>> mixinClasses = reflections.getTypesAnnotatedWith(MixinTargetAnnotation.MixinTarget.class);
+         * for (Class<?> clazz : mixinClasses) {
+         * MixinTargetAnnotation.MixinTarget target = clazz.getAnnotation(MixinTargetAnnotation.MixinTarget.class);
+         * if (target.phase() != MixinTargetAnnotation.Phase.LATE) continue;
+         * boolean isClient = FMLLaunchHandler.side()
+         * .isClient();
+         * if (target.side() == MixinTargetAnnotation.Side.CLIENT && !isClient) continue;
+         * if (target.side() == MixinTargetAnnotation.Side.SERVER && isClient) continue;
+         * if (!specialIds.contains(target.modid()) && !Loader.isModLoaded(target.modid())) continue;
+         * mixins.add(target.modid() + "." + clazz.getSimpleName());
+         * }
+         */
 
-            mixins.add("carbonconfig.ConfigMixin");
-        }
         return mixins;
     }
 }

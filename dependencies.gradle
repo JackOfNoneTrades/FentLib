@@ -35,6 +35,20 @@
  */
 dependencies {
     runtimeOnlyNonPublishable("com.github.GTNewHorizons:NotEnoughItems:2.7.4-GTNH:dev")
-    api(rfg.deobf("maven.modrinth:carbon-config:ttXTOUmO"))
+    // api(rfg.deobf("maven.modrinth:carbon-config:ttXTOUmO"))
+
+    /* Fixes the mod menu being broken ingame, allows for quick config testing */
+    runtimeOnlyNonPublishable(rfg.deobf("curse.maven:endercore-231868:4671288"))
+
     shadowCompile('org.reflections:reflections:0.10.2')
+
+    shadowCompile('org.apache.httpcomponents.core5:httpcore5:5.3.4')
+    shadowCompile('org.apache.httpcomponents.client5:httpclient5:5.5')
+    shadowCompile('commons-fileupload:commons-fileupload:1.6.0')
+    shadowCompile("javax.servlet:javax.servlet-api:4.0.1")
+    shadowCompile('commons-io:commons-io:2.19.0')
+
+    shadowCompile("com.googlecode.concurrentlinkedhashmap:concurrentlinkedhashmap-lru:1.4.2")
+
+    shadowCompile("com.sksamuel.scrimage:scrimage-core:4.3.4")
 }

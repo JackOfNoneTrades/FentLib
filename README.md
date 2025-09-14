@@ -4,23 +4,7 @@ A shared code library and fix mod.
 ![logo](images/logo_small.png)
 
 ## Features
-* Currently fixes `1.7.10` `Carbon Config` array serialization, addressing [this issue](https://github.com/Carbon-Config-Project/CarbonConfigLib/issues/5).
-* Java annotation system for `Carbon Config`. Example usage:
-
-```java
-@FentConfig(name = "testconf")
-public class TestConf {
-
-    @ConfigInt(
-        name = "test_value",
-        comment = "This is a test integer value",
-        defaultValue = 5,
-        min = -10,
-        max = 10,
-        category = "general")
-    public static int testValue;
-}
-```
+* Currently none lol, everything wip
 
 ## Downloads
 <!--* [CurseForge ![curse](images/icons/curse.png)](https://www.curseforge.com/minecraft/mc-mods/fentlib)
