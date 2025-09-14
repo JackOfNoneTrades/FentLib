@@ -13,6 +13,7 @@ public class Config {
 
         public static final String debug = "debug";
         public static final String general = "general";
+        public static final String miscTweaks = "misc-tweaks";
     }
 
     public static boolean debugMode;
@@ -22,6 +23,8 @@ public class Config {
     public static boolean printBiomes = false;
 
     public static String[] passiveMobsWhichCanInflictDamage = {};
+
+    public static boolean disableEnderCoreInfoButton = true;
 
     public static void loadConfig(File configFile) {
         config = new Configuration(configFile);
@@ -65,6 +68,13 @@ public class Config {
                 printBiomes,
                 "If set to true, print a list of biome names on game post init.");
             printBiomes = printBiomesProperty.getBoolean();
+
+            // Misc tweaks
+            disableEnderCoreInfoButton = config.getBoolean(
+                "disableEnderCoreInfoButton",
+                Categories.miscTweaks,
+                disableEnderCoreInfoButton,
+                "Disable the EnderCore information button in the modlist screen.");
 
             FentLib.varInstanceCommon.buildPassiveMobList();
         } catch (Exception e) {

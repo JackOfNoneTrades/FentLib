@@ -1,13 +1,19 @@
 package org.fentanylsolutions.fentlib.util;
 
-import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.relauncher.FMLLaunchHandler;
 import cpw.mods.fml.relauncher.Side;
 
 public class MiscUtil {
 
     public static boolean isServer() {
-        return FMLCommonHandler.instance()
-            .getSide() == Side.SERVER;
+        return FMLLaunchHandler.side()
+            .isServer();
+    }
+
+    public enum Side {
+        CLIENT,
+        SERVER,
+        BOTH;
     }
 
     public static Object[] addAtIndex(Object[] arr, int index, Object val) {

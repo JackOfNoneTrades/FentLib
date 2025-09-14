@@ -45,10 +45,13 @@ public class GuiFactory implements IModGuiFactory {
                 ImmutableList.of(
                     new ConfigElement(
                         Config.getRawConfig()
+                            .getCategory(Config.Categories.general)),
+                    new ConfigElement(
+                        Config.getRawConfig()
                             .getCategory(Config.Categories.debug)),
                     new ConfigElement(
                         Config.getRawConfig()
-                            .getCategory(Config.Categories.general))),
+                            .getCategory(Config.Categories.miscTweaks))),
                 FentLib.MODID,
                 FentLib.MODID,
                 false,

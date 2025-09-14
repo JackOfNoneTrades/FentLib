@@ -78,4 +78,14 @@ public class FentLib {
             LOG.info("DEBUG: {}", message);
         }
     }
+
+    /*
+     * ▖▖..........▗..▄▖..........
+     * ▙▘▛▌▛▌▛▘█▌▛▘▜▘ ▗▘▌▌▛▘▀▌█▌▛▌
+     * ▌▌▙▌▌▌▙▖▙▖▌ ▐▖ ▙▖▙▌▙▖▙▖▙▖▌▌
+     * .................▄▌........
+     */
+
+    // TODO: Make the mod menu scrollable only in the list area. Don't forgor separate mixin for hodgepodge and vanilla
+    // endercore
 }
