@@ -29,7 +29,9 @@ public class EarlyMixinLoader implements IEarlyMixinLoader, IFMLLoadingPlugin {
         return new MixinUtil.MixinBuilder().addMixin("AccessorDimensionManager", MiscUtil.Side.BOTH, "minecraftforge")
             .addMixin("EntityLivingBaseMixin", MiscUtil.Side.BOTH)
             .addMixin("AccessorGuiScreen", MiscUtil.Side.CLIENT)
+            .addMixin("FeatureSaveServerDataAsJson$MixinSaveAsJson", MiscUtil.Side.CLIENT)
 
+            .addMixin("MixinJarDiscoverer", MiscUtil.Side.BOTH, "fml")
             .build();
     }
 
