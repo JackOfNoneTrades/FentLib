@@ -32,6 +32,12 @@ public class EarlyMixinLoader implements IEarlyMixinLoader, IFMLLoadingPlugin {
             .addMixin("FeatureSaveServerDataAsJson$MixinSaveAsJson", MiscUtil.Side.CLIENT)
 
             .addMixin("MixinJarDiscoverer", MiscUtil.Side.BOTH, "fml")
+
+            .addMixin("FeatureAnimatedIcon$MixinMinecraftServer", MiscUtil.Side.SERVER)
+            .addMixin("FeatureAnimatedIcon$MixinServerData", MiscUtil.Side.CLIENT)
+            .addMixin("FeatureAnimatedIcon$MixinOldServerPinger", MiscUtil.Side.CLIENT)
+            .addMixin("FeatureAnimatedIcon$MixinServerList", MiscUtil.Side.CLIENT)
+            .addMixin("FeatureAnimatedIcon$MixinServerListEntryNormal", MiscUtil.Side.CLIENT)
             .build();
     }
 
