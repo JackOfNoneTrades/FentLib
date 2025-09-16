@@ -1,5 +1,8 @@
 package org.fentanylsolutions.fentlib.util;
 
+import net.minecraft.entity.player.EntityPlayerMP;
+
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.FMLLaunchHandler;
 import cpw.mods.fml.relauncher.Side;
 
@@ -10,10 +13,37 @@ public class MiscUtil {
             .isServer();
     }
 
+    public static boolean isOp(EntityPlayerMP entityPlayerMP) {
+        // func_152596_g: canSendCommands
+        return FMLCommonHandler.instance()
+            .getMinecraftServerInstance()
+            .getConfigurationManager()
+            .func_152596_g(entityPlayerMP.getGameProfile());
+    }
+
     public enum Side {
         CLIENT,
         SERVER,
         BOTH;
+    }
+
+    public enum PermissionLevel {
+
+        ALL(0), // Everyone
+        OP(1), // Operator
+        OP_2(2), // Higher-level OP
+        OP_3(3),
+        OP_4(4); // Full permissions (e.g., stop, op, etc.)
+
+        private final int level;
+
+        PermissionLevel(int level) {
+            this.level = level;
+        }
+
+        public int getLevel() {
+            return level;
+        }
     }
 
     public static Object[] addAtIndex(Object[] arr, int index, Object val) {

@@ -10,7 +10,6 @@ import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.ServerList;
 
 import org.fentanylsolutions.fentlib.FentLib;
-import org.fentanylsolutions.fentlib.mixins.DummyTarget;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
@@ -19,7 +18,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
-@Mixin(DummyTarget.class)
 public class FeatureSaveServerDataAsJson {
 
     @Mixin(ServerList.class)

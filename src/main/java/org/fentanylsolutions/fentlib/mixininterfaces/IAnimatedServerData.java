@@ -8,8 +8,8 @@ public interface IAnimatedServerData {
 
     void setIsAnimatedIcon(boolean val);
 
-    GifUtil.GifAnimationData getGifAnimationData();
+    GifUtil.StitchedAnimationData getStitchedAnimationData();
 
-    void setGifAnimationData(GifUtil.GifAnimationData data);
+    void setStitchedAnimationData(GifUtil.StitchedAnimationData data);
 
 }

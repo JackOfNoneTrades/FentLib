@@ -27,8 +27,13 @@ public class EarlyMixinLoader implements IEarlyMixinLoader, IFMLLoadingPlugin {
     @Override
     public List<String> getMixins(Set<String> loadedCoreMods) {
         return new MixinUtil.MixinBuilder().addMixin("AccessorDimensionManager", MiscUtil.Side.BOTH, "minecraftforge")
-            .addMixin("EntityLivingBaseMixin", MiscUtil.Side.BOTH)
+            // Accessors
             .addMixin("AccessorGuiScreen", MiscUtil.Side.CLIENT)
+            .addMixin("AccessorMinecraftServer", MiscUtil.Side.BOTH)
+            .addMixin("AccessorS00PacketServerInfo", MiscUtil.Side.BOTH)
+
+            // Rest
+            .addMixin("EntityLivingBaseMixin", MiscUtil.Side.BOTH)
             .addMixin("FeatureSaveServerDataAsJson$MixinSaveAsJson", MiscUtil.Side.CLIENT)
 
             .addMixin("MixinJarDiscoverer", MiscUtil.Side.BOTH, "fml")
@@ -36,8 +41,11 @@ public class EarlyMixinLoader implements IEarlyMixinLoader, IFMLLoadingPlugin {
             .addMixin("FeatureAnimatedIcon$MixinMinecraftServer", MiscUtil.Side.SERVER)
             .addMixin("FeatureAnimatedIcon$MixinServerData", MiscUtil.Side.CLIENT)
             .addMixin("FeatureAnimatedIcon$MixinOldServerPinger", MiscUtil.Side.CLIENT)
-            .addMixin("FeatureAnimatedIcon$MixinServerList", MiscUtil.Side.CLIENT)
             .addMixin("FeatureAnimatedIcon$MixinServerListEntryNormal", MiscUtil.Side.CLIENT)
+            // .addMixin("FeatureAnimatedIcon$MixinS00PacketServerInfo", MiscUtil.Side.BOTH)
+            .addMixin("FeatureAnimatedIcon$MixinPacketBuffer", MiscUtil.Side.BOTH)
+
+            // .addMixin("FeatureAnimatedIcon$MixinC00Handshake", MiscUtil.Side.BOTH)
             .build();
     }
 

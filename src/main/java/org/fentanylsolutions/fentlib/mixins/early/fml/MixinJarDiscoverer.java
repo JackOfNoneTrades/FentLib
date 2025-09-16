@@ -14,6 +14,7 @@ import cpw.mods.fml.common.discovery.asm.ASMModParser;
 @Mixin(JarDiscoverer.class)
 public class MixinJarDiscoverer {
 
+    // TODO: The @Redirect works, the @WrapOperation does not (breaks a ton of shit)
     /*
      * @WrapOperation(
      * method = "discover",

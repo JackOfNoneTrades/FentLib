@@ -23,6 +23,8 @@ public class Config {
     public static boolean printBiomes = false;
 
     public static String[] passiveMobsWhichCanInflictDamage = {};
+    public static int maxGifFrameCount = 1000;
+    public static int gifSizeCap = 2;
 
     public static boolean disableEnderCoreInfoButton = true;
 
@@ -30,16 +32,11 @@ public class Config {
         config = new Configuration(configFile);
 
         try {
+            FentLib.debug("Loading config");
             config.load();
 
             // Debug
             debugMode = config.getBoolean("debugMode", Categories.debug, debugMode, "Enable debug mode.");
-            Property passiveMobsWhichCanInflictDamageProperty = config.get(
-                Categories.general,
-                "passiveMobsWhichCanInflictDamage",
-                passiveMobsWhichCanInflictDamage,
-                "List of passive mobs that should be able to inflict damage.");
-            passiveMobsWhichCanInflictDamage = passiveMobsWhichCanInflictDamageProperty.getStringList();
 
             Property printPotionsProperty = config.get(
                 Categories.debug,
@@ -68,6 +65,29 @@ public class Config {
                 printBiomes,
                 "If set to true, print a list of biome names on game post init.");
             printBiomes = printBiomesProperty.getBoolean();
+
+            // General
+            Property passiveMobsWhichCanInflictDamageProperty = config.get(
+                Categories.general,
+                "passiveMobsWhichCanInflictDamage",
+                passiveMobsWhichCanInflictDamage,
+                "List of passive mobs that should be able to inflict damage.");
+            passiveMobsWhichCanInflictDamage = passiveMobsWhichCanInflictDamageProperty.getStringList();
+
+            maxGifFrameCount = config.getInt(
+                "maxGifFrameCount",
+                Categories.general,
+                maxGifFrameCount,
+                1,
+                9999,
+                "Maximum frames a gif is allowed to have.");
+            gifSizeCap = config.getInt(
+                "gifSizeCap",
+                Categories.general,
+                gifSizeCap,
+                1,
+                10,
+                "Gif size cap in megabytes after being stitched into a png spritesheet.");
 
             // Misc tweaks
             disableEnderCoreInfoButton = config.getBoolean(

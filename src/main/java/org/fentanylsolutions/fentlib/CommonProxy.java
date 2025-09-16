@@ -1,5 +1,6 @@
 package org.fentanylsolutions.fentlib;
 
+import org.fentanylsolutions.fentlib.command.CommandReloadServerIcon;
 import org.fentanylsolutions.fentlib.util.MiscUtil;
 import org.fentanylsolutions.fentlib.varinstances.VarInstanceClient;
 import org.fentanylsolutions.fentlib.varinstances.VarInstanceCommon;
@@ -36,5 +37,7 @@ public class CommonProxy {
     }
 
     // register server commands in this event handler (Remove if not needed)
-    public void serverStarting(FMLServerStartingEvent event) {}
+    public void serverStarting(FMLServerStartingEvent event) {
+        event.registerServerCommand(new CommandReloadServerIcon());
+    }
 }
