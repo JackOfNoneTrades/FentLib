@@ -4,7 +4,10 @@ A shared code library and fix mod.
 ![logo](images/logo_small.png)
 
 ## Features
-* Currently none lol, everything wip
+* Support for animated GIF server icons. Just drop a `server-icon.gif` file in the server root directory. Size limits are configurable. HodgePodge is a soft dependency, required if you want to use larger GIFs (because of the packet size limit).
+![animated_server_icons](images/animated_server_icons.gif)
+* Removal of EnderCore / HodgePodge Info Button in the mod list screen.
+* More to come!
 
 ## Downloads
 <!--* [CurseForge ![curse](images/icons/curse.png)](https://www.curseforge.com/minecraft/mc-mods/fentlib)
