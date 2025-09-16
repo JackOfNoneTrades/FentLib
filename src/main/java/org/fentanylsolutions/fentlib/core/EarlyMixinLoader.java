@@ -31,6 +31,8 @@ public class EarlyMixinLoader implements IEarlyMixinLoader, IFMLLoadingPlugin {
             .addMixin("AccessorGuiScreen", MiscUtil.Side.CLIENT)
             .addMixin("AccessorMinecraftServer", MiscUtil.Side.BOTH)
             .addMixin("AccessorS00PacketServerInfo", MiscUtil.Side.BOTH)
+            .addMixin("AccessorNetHandlerStatusServer", MiscUtil.Side.BOTH)
+            .addMixin("AccessorC00Handshake", MiscUtil.Side.BOTH)
 
             // Rest
             .addMixin("EntityLivingBaseMixin", MiscUtil.Side.BOTH)
@@ -42,10 +44,8 @@ public class EarlyMixinLoader implements IEarlyMixinLoader, IFMLLoadingPlugin {
             .addMixin("FeatureAnimatedIcon$MixinServerData", MiscUtil.Side.CLIENT)
             .addMixin("FeatureAnimatedIcon$MixinOldServerPinger", MiscUtil.Side.CLIENT)
             .addMixin("FeatureAnimatedIcon$MixinServerListEntryNormal", MiscUtil.Side.CLIENT)
-            // .addMixin("FeatureAnimatedIcon$MixinS00PacketServerInfo", MiscUtil.Side.BOTH)
             .addMixin("FeatureAnimatedIcon$MixinPacketBuffer", MiscUtil.Side.BOTH)
 
-            // .addMixin("FeatureAnimatedIcon$MixinC00Handshake", MiscUtil.Side.BOTH)
             .build();
     }
 

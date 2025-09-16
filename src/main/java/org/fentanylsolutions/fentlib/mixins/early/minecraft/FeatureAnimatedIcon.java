@@ -144,7 +144,29 @@ public class FeatureAnimatedIcon {
          */
         @Overwrite
         private void func_147138_a(ServerStatusResponse response) {
-            if (false) {
+            // TODO: Send png to vanilla clients
+            File file = this.getFile("server-icon.gif");
+
+            if (file.isFile()) {
+                byte[] gifBytes;
+
+                try {
+                    gifBytes = Files.readAllBytes(file.toPath());
+
+                    GifUtil.StitchedAnimationData stichedData = GifUtil.stitchedFromBytes(gifBytes, 32, 32);
+                    if (stichedData == null) {
+                        FentLib.LOG.error("Couldn't load animated server icon GIF into stitched data");
+                        return;
+                    }
+
+                    byte[] serializedData = GifUtil.serializeStitchedData(stichedData);
+                    String base64 = Base64.getEncoder()
+                        .encodeToString(serializedData);
+                    response.func_151320_a("data:image/stitched;base64," + base64);
+                } catch (Exception e) {
+                    logger.error("Couldn't load animated server icon GIF", e);
+                }
+            } else {
                 File file1 = this.getFile("server-icon.png");
                 if (file1.isFile()) {
                     ByteBuf bytebuf = Unpooled.buffer();
@@ -162,30 +184,6 @@ public class FeatureAnimatedIcon {
                     }
                 } else {
                     FentLib.LOG.info("Server icon not found");
-                }
-            } else {
-
-                File file = this.getFile("server-icon.gif");
-
-                if (file.isFile()) {
-                    byte[] gifBytes;
-
-                    try {
-                        gifBytes = Files.readAllBytes(file.toPath());
-
-                        GifUtil.StitchedAnimationData stichedData = GifUtil.stitchedFromBytes(gifBytes, 32, 32);
-                        if (stichedData == null) {
-                            FentLib.LOG.error("Couldn't load animated server icon GIF into stitched data");
-                            return;
-                        }
-
-                        byte[] serializedData = GifUtil.serializeStitchedData(stichedData);
-                        String base64 = Base64.getEncoder()
-                            .encodeToString(serializedData);
-                        response.func_151320_a("data:image/stitched;base64," + base64);
-                    } catch (Exception e) {
-                        logger.error("Couldn't load animated server icon GIF", e);
-                    }
                 }
             }
         }
