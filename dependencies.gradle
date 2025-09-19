@@ -49,7 +49,5 @@ dependencies {
 
     shadowCompile("com.googlecode.concurrentlinkedhashmap:concurrentlinkedhashmap-lru:1.4.2")
 
-    shadeCompile("com.sksamuel.scrimage:scrimage-core:4.3.4")
-    //shadeCompile("com.twelvemonkeys.imageio:imageio-core:3.12.0")
-    //shadeCompile("com.twelvemonkeys.imageio:imageio-jpeg:3.12.0")
+    shadowCompile("com.sksamuel.scrimage:scrimage-core:4.4.0-fent")
 }
