@@ -8,6 +8,32 @@ A shared code library and tweak/fix mod.
 ![animated_server_icons](images/animated_server_icons.gif)
 Use the `/reload_icon` command to reload the icon. Also works for `server-icon.png`.
 * Removal of EnderCore / HodgePodge Info Button in the mod list screen.
+* API to pass additional data in the `C00PacketServerQuery` packet (e.g. list your client capabilities), and modify the `S00PacketServerInfo` packet accordingly. Example:
+```java
+public class ClientProxy extends CommonProxy {
+    @Override
+    public void preInit(FMLPreInitializationEvent event) {
+        S00PacketServerInfoModifyService.put("i_support_animated_gifs", "1");
+        // You can also put more comples JsonElement objects
+    }
+}
+
+public class CommonProxy {
+  public void preInit(FMLPreInitializationEvent event) {
+    if (MiscUtil.isServer()) {
+      S00PacketServerInfoModifyService.registerHandler((response, data) -> {
+        if (data.has("i_support_animated_gifs")) {
+          FentLib.debug("Client has support for animated gifs!");
+          // send animated gif
+        } else {
+          FentLib.debug("Client has no support for animated gifs");
+          // send normal image
+        }
+      });
+    }
+  }
+}
+```
 * More to come!
 
 ## Downloads
