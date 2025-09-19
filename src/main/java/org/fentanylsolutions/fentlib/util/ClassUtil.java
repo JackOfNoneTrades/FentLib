@@ -11,7 +11,6 @@ public class ClassUtil {
         for (ModContainer container : Loader.instance()
             .getModList()) {
             for (String ownedPkg : container.getOwnedPackages()) {
-                // System.out.println("Testing " + pkg + " and " + configClass.getPackage().getName());
                 if (pkg.equals(ownedPkg)) {
                     return container;
                 }

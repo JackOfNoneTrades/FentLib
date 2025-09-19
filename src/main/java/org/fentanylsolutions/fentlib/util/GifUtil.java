@@ -177,7 +177,6 @@ public class GifUtil {
                 "Invalid GIF dimensions: must be 32x32, got " + data.frameWidth + "x" + data.frameHeight);
         }
         if (data.frameCount <= 0 || data.frameCount > Config.maxGifFrameCount) {
-            System.out.println("conf max: " + Config.maxGifFrameCount);
             throw new IOException(
                 "Invalid frame count: " + data.frameCount + "(maximum configured: " + Config.maxGifFrameCount + ")");
         }

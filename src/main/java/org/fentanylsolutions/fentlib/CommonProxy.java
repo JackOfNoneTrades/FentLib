@@ -1,8 +1,8 @@
 package org.fentanylsolutions.fentlib;
 
 import org.fentanylsolutions.fentlib.command.CommandReloadServerIcon;
+import org.fentanylsolutions.fentlib.services.S00PacketServerInfoModifyService;
 import org.fentanylsolutions.fentlib.util.MiscUtil;
-import org.fentanylsolutions.fentlib.varinstances.VarInstanceClient;
 import org.fentanylsolutions.fentlib.varinstances.VarInstanceCommon;
 import org.fentanylsolutions.fentlib.varinstances.VarInstanceServer;
 
@@ -19,8 +19,22 @@ public class CommonProxy {
         FentLib.varInstanceCommon = new VarInstanceCommon();
         if (MiscUtil.isServer()) {
             FentLib.varInstanceServer = new VarInstanceServer();
-        } else {
-            FentLib.varInstanceClient = new VarInstanceClient();
+
+            S00PacketServerInfoModifyService.registerHandler((response, data) -> {
+                if (data.has(FentLib.ANIMATED_FEATURE)) {
+                    FentLib.debug("Data has animated feature");
+                    if (FentLib.varInstanceServer.animatedFaviconBlob != null) {
+                        FentLib.debug("Animated favicon not null, serving it");
+                        response.func_151320_a(FentLib.varInstanceServer.animatedFaviconBlob);
+                    } else {
+                        FentLib.debug("Animated favicon not null, serving static");
+                        response.func_151320_a(FentLib.varInstanceServer.staticFaviconBlob);
+                    }
+                } else {
+                    FentLib.debug("Data has no animated feature, serving static");
+                    response.func_151320_a(FentLib.varInstanceServer.staticFaviconBlob);
+                }
+            });
         }
         Config.loadConfig(FentLib.confFile);
         FentLib.LOG.info("I am Fentlib at version " + Tags.VERSION);

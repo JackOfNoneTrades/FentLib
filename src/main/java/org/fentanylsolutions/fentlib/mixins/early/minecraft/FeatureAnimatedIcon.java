@@ -3,10 +3,7 @@ package org.fentanylsolutions.fentlib.mixins.early.minecraft;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.util.Base64;
-
-import javax.imageio.ImageIO;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
@@ -21,7 +18,6 @@ import net.minecraft.network.status.server.S00PacketServerInfo;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ResourceLocation;
 
-import org.apache.commons.lang3.Validate;
 import org.apache.logging.log4j.Logger;
 import org.fentanylsolutions.fentlib.FentLib;
 import org.fentanylsolutions.fentlib.mixininterfaces.IAnimatedServerData;
@@ -38,10 +34,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.google.common.base.Charsets;
+import com.llamalad7.mixinextras.sugar.Local;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufOutputStream;
-import io.netty.buffer.Unpooled;
 
 public class FeatureAnimatedIcon {
 
@@ -92,7 +87,7 @@ public class FeatureAnimatedIcon {
         }
     }
 
-    @Mixin(targets = "net.minecraft.client.network.OldServerPinger$1") // This is the anonymous class
+    @Mixin(targets = "net.minecraft.client.network.OldServerPinger$1")
     public static class MixinOldServerPinger {
 
         @Shadow(aliases = "val$p_147224_1_", remap = false)
@@ -103,20 +98,22 @@ public class FeatureAnimatedIcon {
             method = "handleServerInfo",
             at = @At(value = "INVOKE", target = "Ljava/lang/String;startsWith(Ljava/lang/String;)Z"))
         private boolean interceptStartsWith(String iconData, String prefix) {
-            FentLib.LOG.info("[mixin] interceptStartsWith");
-            System.out.println("val$server: " + val$server);
-            System.out.println(val$server.serverIP);
+            FentLib.debug("[mixin] interceptStartsWith");
+            FentLib.debug("val$server: " + val$server);
+            FentLib.debug(val$server.serverIP);
             if (iconData.startsWith("data:image/stitched;base64,")) {
                 handleGifIcon(iconData, val$server);
                 return false;
             }
+            ((IAnimatedServerData) val$server).setIsAnimatedIcon(false);
+            ((IAnimatedServerData) val$server).setStitchedAnimationData(null);
             return iconData.startsWith(prefix);
         }
 
         private static void handleGifIcon(String gifData, ServerData serverData) {
             String base64Data = gifData.substring("data:image/stitched;base64,".length());
 
-            System.out.println(
+            FentLib.debug(
                 "Detected Stitched server icon: " + base64Data.substring(0, Math.min(50, base64Data.length())) + "...");
             serverData.func_147407_a(base64Data);
             ((IAnimatedServerData) serverData).setIsAnimatedIcon(true);
@@ -124,7 +121,22 @@ public class FeatureAnimatedIcon {
 
         @Inject(method = "handleServerInfo", at = @At("HEAD"))
         private void onHandleServerInfo(S00PacketServerInfo packetIn, CallbackInfo ci) {
-            System.out.println("[Mixin] handleServerInfo was called: " + packetIn);
+            FentLib.debug("[Mixin] handleServerInfo was called: " + packetIn);
+        }
+
+        @Redirect(
+            method = "handleServerInfo",
+            at = @At(
+                value = "INVOKE",
+                target = "Lorg/apache/logging/log4j/Logger;error(Ljava/lang/String;)V",
+                ordinal = 0,
+                remap = false))
+        private void redirectInvalidIconLog(Logger logger, String message, @Local String s) {
+            if (s != null && s.startsWith("data:image/stitched;base64,")) {
+                FentLib.debug("Bypassing unknown format error for stitched image");
+                return;
+            }
+            logger.error(message);
         }
     }
 
@@ -144,48 +156,7 @@ public class FeatureAnimatedIcon {
          */
         @Overwrite
         private void func_147138_a(ServerStatusResponse response) {
-            // TODO: Send png to vanilla clients
-            File file = this.getFile("server-icon.gif");
-
-            if (file.isFile()) {
-                byte[] gifBytes;
-
-                try {
-                    gifBytes = Files.readAllBytes(file.toPath());
-
-                    GifUtil.StitchedAnimationData stichedData = GifUtil.stitchedFromBytes(gifBytes, 32, 32);
-                    if (stichedData == null) {
-                        FentLib.LOG.error("Couldn't load animated server icon GIF into stitched data");
-                        return;
-                    }
-
-                    byte[] serializedData = GifUtil.serializeStitchedData(stichedData);
-                    String base64 = Base64.getEncoder()
-                        .encodeToString(serializedData);
-                    response.func_151320_a("data:image/stitched;base64," + base64);
-                } catch (Exception e) {
-                    logger.error("Couldn't load animated server icon GIF", e);
-                }
-            } else {
-                File file1 = this.getFile("server-icon.png");
-                if (file1.isFile()) {
-                    ByteBuf bytebuf = Unpooled.buffer();
-                    try {
-                        BufferedImage bufferedimage = ImageIO.read(file1);
-                        Validate.validState(bufferedimage.getWidth() == 64, "Must be 64 pixels wide");
-                        Validate.validState(bufferedimage.getHeight() == 64, "Must be 64 pixels high");
-                        ImageIO.write(bufferedimage, "PNG", new ByteBufOutputStream(bytebuf));
-                        ByteBuf bytebuf1 = io.netty.handler.codec.base64.Base64.encode(bytebuf);
-                        response.func_151320_a("data:image/png;base64," + bytebuf1.toString(Charsets.UTF_8));
-                    } catch (Exception exception) {
-                        logger.error("Couldn\'t load server icon", exception);
-                    } finally {
-                        bytebuf.release();
-                    }
-                } else {
-                    FentLib.LOG.info("Server icon not found");
-                }
-            }
+            FentLib.varInstanceServer.loadFavicons();
         }
     }
 
@@ -216,68 +187,47 @@ public class FeatureAnimatedIcon {
             if (base64 == null || !((IAnimatedServerData) field_148301_e).getIsAnimatedIcon()) {
                 return;
             }
-            System.out.println("Detected animated gif icon, drawing it instead");
+            FentLib.debug("Detected animated gif icon, drawing it instead");
             ci.cancel();
 
-            /*
-             * FentLib.varInstanceClient.gifloaderPool.submit(() -> {
-             * try {
-             * // Step 1: Decode Base64
-             * byte[] decoded = Base64.getDecoder()
-             * .decode(field_148301_e.getBase64EncodedIconData());
-             * // Step 2: Load gif data (should return your GifAnimationData)
-             * GifUtil.StitchedAnimationData stitchedData = GifUtil.deserializeStitchedData(decoded);
-             * // Step 3: Store it somewhere (can cache on serverData or static map if needed)
-             * ((IAnimatedServerData) this.field_148301_e).setStitchedAnimationData(stitchedData);
-             * // Step 4: Set the dynamic texture
-             * BufferedImage stitchedImage = GifUtil.byteArrayToBufferedImage(stitchedData.stichedData);
-             * if (stitchedImage == null) {
-             * FentLib.LOG.error("Failed to reconstruct image from stitched data");
-             * return;
-             * }
-             * this.field_148305_h = new DynamicTexture(stitchedImage);
-             * // Step 5: Set the texture location
-             * this.field_148306_i = field_148300_d.getTextureManager()
-             * .getDynamicTextureLocation("server_icon_" + field_148301_e.serverIP, this.field_148305_h);
-             * } catch (Exception e) {
-             * FentLib.LOG.error("Failed to decode animated gif icon", e);
-             * field_148301_e.func_147407_a(null);
-             * }
-             * });
-             */
-
+            Minecraft mc = Minecraft.getMinecraft();
             FentLib.varInstanceClient.gifloaderPool.submit(() -> {
                 try {
+                    long t0 = System.nanoTime();
                     byte[] decoded = Base64.getDecoder()
                         .decode(base64);
+                    long t1 = System.nanoTime();
                     GifUtil.StitchedAnimationData stitchedData = GifUtil.deserializeStitchedData(decoded);
                     GifUtil.validateStitchedData(stitchedData);
-
+                    long t2 = System.nanoTime();
                     BufferedImage stitchedImage = GifUtil.byteArrayToBufferedImage(stitchedData.stichedData);
                     if (stitchedImage == null) {
                         FentLib.LOG.error("Failed to reconstruct stitched image");
                         return;
                     }
+                    long t3 = System.nanoTime();
+                    FentLib.debug("Base64 decode: " + (t1 - t0) / 1_000_000.0 + " ms");
+                    FentLib.debug("Deserialize:   " + (t2 - t1) / 1_000_000.0 + " ms");
+                    FentLib.debug("Image decode:  " + (t3 - t2) / 1_000_000.0 + " ms");
 
-                    Minecraft mc = Minecraft.getMinecraft();
-                    synchronized (mc) {
-                        mc.func_152344_a(() -> {
-                            try {
-                                field_148305_h = new DynamicTexture(stitchedImage);
-                                field_148306_i = field_148300_d.getTextureManager()
-                                    .getDynamicTextureLocation(
-                                        "server_icon_" + field_148301_e.serverIP,
-                                        field_148305_h);
-                                ((IAnimatedServerData) field_148301_e).setStitchedAnimationData(stitchedData);
-                            } catch (Exception e) {
-                                FentLib.LOG.error("Failed to create DynamicTexture on main thread", e);
-                            }
-                        });
-                    }
+                    mc.func_152344_a(() -> {
+                        try {
+                            long t4 = System.nanoTime();
+                            field_148305_h = new DynamicTexture(stitchedImage);
+                            field_148306_i = field_148300_d.getTextureManager()
+                                .getDynamicTextureLocation("server_icon_" + field_148301_e.serverIP, field_148305_h);
+                            ((IAnimatedServerData) field_148301_e).setStitchedAnimationData(stitchedData);
+                            long t5 = System.nanoTime();
+                            FentLib.debug("GL Upload:     " + (t5 - t4) / 1_000_000.0 + " ms");
+                        } catch (Exception glEx) {
+                            FentLib.LOG.error("Failed to upload dynamic texture", glEx);
+                            field_148301_e.func_147407_a(null);
+                        }
+                    });
 
                 } catch (Exception e) {
                     FentLib.LOG.error("Failed to decode or validate stitched animation", e);
-                    field_148301_e.func_147407_a(null);
+                    mc.func_152344_a(() -> field_148301_e.func_147407_a(null));
                 }
             });
         }
@@ -353,9 +303,9 @@ public class FeatureAnimatedIcon {
          */
         @Overwrite
         public String readStringFromBuffer(int maxLength) {
-            System.out.println("Custom readStringFromBuffer is active");
             int length = ((PacketBuffer) (Object) this).readVarIntFromBuffer();
 
+            // TODO: find some limit?
             if (length > 9_600_000) {
                 // throw new DecoderException("The received string length is longer than maximum allowed (" + length + "
                 // >
@@ -373,7 +323,6 @@ public class FeatureAnimatedIcon {
          */
         @Overwrite
         public void writeStringToBuffer(String str) {
-            System.out.println("Custom writeStringFromBuffer is active");
             byte[] abyte = str.getBytes(Charsets.UTF_8);
 
             if (abyte.length > 9_600_000) {
