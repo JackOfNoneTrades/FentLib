@@ -32,7 +32,7 @@ public class MixinRemoveInfoButton {
                 .getSimpleName()
                 .equals("InfoButton")) {
                 iter.remove();
-                break; // Stop after first match
+                break;
             }
         }
     }

@@ -27,7 +27,9 @@ public class CommonProxy {
                         FentLib.debug("Animated favicon not null, serving it");
                         response.func_151320_a(FentLib.varInstanceServer.animatedFaviconBlob);
                     } else {
-                        FentLib.debug("Animated favicon not null, serving static");
+                        FentLib.debug(
+                            "Animated favicon null, serving static"
+                                + (FentLib.varInstanceServer.staticFaviconBlob == null ? " (which is also null)" : ""));
                         response.func_151320_a(FentLib.varInstanceServer.staticFaviconBlob);
                     }
                 } else {

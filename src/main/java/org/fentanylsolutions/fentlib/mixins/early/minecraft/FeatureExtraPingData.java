@@ -46,19 +46,15 @@ public class FeatureExtraPingData {
 
         @Inject(method = "readPacketData", at = @At("TAIL"))
         private void readClientCapabilities(PacketBuffer data, CallbackInfo ci) throws IOException {
-            // SERVER SIDE: Try to read capabilities, fallback gracefully for vanilla clients
             FentLib.debug("Reading extra data in readPacketData");
             try {
-                // Check if there's data remaining in the buffer
                 if (data.readableBytes() > 0) {
                     this.extraData = data.readStringFromBuffer(Integer.MAX_VALUE / 5);
                     FentLib.debug("Extra data: " + this.extraData);
                 } else {
-                    // Empty packet buffer = vanilla client
                     this.extraData = "";
                 }
             } catch (Exception e) {
-                // Any read error = vanilla client
                 this.extraData = "";
             }
         }
@@ -81,17 +77,12 @@ public class FeatureExtraPingData {
             String extraData = ((IC00PacketServerQuery) packetIn).getExtraData();
             FentLib.debug("[Mixin] Packet extra data: '" + extraData + "'");
 
-            if (!extraData.isEmpty()) {
-                FentLib.debug("[Mixin] Modifying outbound packet");
-                // Call to a handler like this S00PacketServerInfoModifyService.modify(field_147314_a.func_147134_at(),
-                // extraData);
-                // S00PacketServerInfoModifyService.modify parses extraData into a Gson JsonObject
-                // S00PacketServerInfoModifyService has a list of functions that take a ServerStatusResponse and a
-                // JsonObject
-                // those functions apply whatever they want to the ServerStatusResponse
-                S00PacketServerInfoModifyService.modify(field_147314_a.func_147134_at(), extraData);
-                // field_147314_a.func_147134_at().func_151319_a(new ServerStatusResponse.PlayerCountData(-69, -420));
+            if (extraData.isEmpty()) {
+                extraData = "{}";
             }
+
+            FentLib.debug("[Mixin] Modifying outbound packet");
+            S00PacketServerInfoModifyService.modify(field_147314_a.func_147134_at(), extraData);
         }
 
         /*

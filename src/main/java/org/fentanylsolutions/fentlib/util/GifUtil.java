@@ -189,7 +189,7 @@ public class GifUtil {
         }
 
         int imgLength = data.stichedData.length;
-        if (imgLength <= 0 || imgLength > Config.gifSizeCap * 1024 * 1024) { // 2 MB cap
+        if (imgLength <= 0 || imgLength > Config.gifSizeCap * 1024 * 1024) {
             throw new IOException(
                 "Invalid stitched image size: " + imgLength
                     + "(maximum configured: "

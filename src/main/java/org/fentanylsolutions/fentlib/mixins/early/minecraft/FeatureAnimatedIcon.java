@@ -34,6 +34,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.google.common.base.Charsets;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 
 import io.netty.buffer.ByteBuf;
@@ -61,6 +63,7 @@ public class FeatureAnimatedIcon {
             MixinServerData mixinServerData = (MixinServerData) (Object) serverData;
             if (nbtCompound.hasKey("animatedIcon")) {
                 mixinServerData.isAnimatedIcon = nbtCompound.getBoolean("animatedIcon");
+                FentLib.debug("nbtCompound has animatedIcon key with value " + mixinServerData.isAnimatedIcon);
             } else {
                 mixinServerData.isAnimatedIcon = false;
             }
@@ -73,6 +76,7 @@ public class FeatureAnimatedIcon {
 
         @Override
         public void setIsAnimatedIcon(boolean val) {
+            FentLib.debug("setIsAnimatedIcon(" + val + ")");
             this.isAnimatedIcon = val;
         }
 
@@ -83,6 +87,7 @@ public class FeatureAnimatedIcon {
 
         @Override
         public void setStitchedAnimationData(GifUtil.StitchedAnimationData data) {
+            FentLib.debug("setStitchedAnimationData called");
             this.stitchedAnimationData = data;
         }
     }
@@ -105,9 +110,13 @@ public class FeatureAnimatedIcon {
                 handleGifIcon(iconData, val$server);
                 return false;
             }
+            boolean isPng = iconData.startsWith(prefix);
+            if (isPng) {
+                FentLib.debug("Received static png data.");
+            }
             ((IAnimatedServerData) val$server).setIsAnimatedIcon(false);
             ((IAnimatedServerData) val$server).setStitchedAnimationData(null);
-            return iconData.startsWith(prefix);
+            return isPng;
         }
 
         private static void handleGifIcon(String gifData, ServerData serverData) {
@@ -183,10 +192,15 @@ public class FeatureAnimatedIcon {
 
         @Inject(method = "func_148297_b", at = @At("HEAD"), cancellable = true)
         private void onFunc148297b(CallbackInfo ci) {
+            // Need to null those fields, otherwise the first reload from a gif to a statuic image will produce a
+            // corrupted blend of the two.
+            field_148305_h = null;
+            field_148306_i = null;
             String base64 = field_148301_e.getBase64EncodedIconData();
             if (base64 == null || !((IAnimatedServerData) field_148301_e).getIsAnimatedIcon()) {
                 return;
             }
+
             FentLib.debug("Detected animated gif icon, drawing it instead");
             ci.cancel();
 
@@ -232,35 +246,11 @@ public class FeatureAnimatedIcon {
             });
         }
 
-        @Redirect(
+        @WrapOperation(
             method = "drawEntry",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;func_146110_a(IIFFIIFF)V", ordinal = 1))
         private void redirectServerIconDraw(int x, int y, float u, float v, int width, int height, float texWidth,
-            float texHeight) {
-            /*
-             * GifUtil.GifAnimationData gif = ((IMixinServerData)field_148301_e).getGifAnimationData();
-             * if (gif != null) {
-             * // Animated icon: calculate frame UVs
-             * long time = Minecraft.getSystemTime();
-             * int frameIndex = (int) ((time / gif.frameDelayMs) % gif.frameCount);
-             * int uPixels = frameIndex * gif.frameWidth;
-             * Minecraft.getMinecraft().getTextureManager().bindTexture(this.field_148306_i);
-             * Gui.func_146110_a(
-             * x, y,
-             * (float) uPixels, 0.0f,
-             * gif.frameWidth, gif.frameHeight,
-             * gif.frameWidth * gif.frameCount, gif.frameHeight
-             * );
-             * } else {
-             * // Default (static) icon path
-             * Gui.func_146110_a(x, y, u, v, width, height, texWidth, texHeight);
-             * }
-             */
-            redirectServerIconDraw(x, y, u, v, width, height, texWidth, texHeight, field_148301_e, field_148306_i);
-        }
-
-        private static void redirectServerIconDraw(int x, int y, float u, float v, int width, int height,
-            float texWidth, float texHeight, ServerData field_148301_e, ResourceLocation field_148306_i) {
+            float texHeight, Operation original) {
             GifUtil.StitchedAnimationData stitchedData = ((IAnimatedServerData) field_148301_e)
                 .getStitchedAnimationData();
 
@@ -286,6 +276,8 @@ public class FeatureAnimatedIcon {
                 Minecraft.getMinecraft()
                     .getTextureManager()
                     .bindTexture(Gui.icons);
+            } else {
+                original.call(x, y, u, v, width, height, texWidth, texHeight);
             }
         }
     }

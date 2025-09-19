@@ -78,9 +78,7 @@ public class FeatureSaveServerDataAsJson {
                     serverData.serverMOTD = "";
                     serverData.populationInfo = "";
                     serverData.gameVersion = "";
-                    // serverData. = "";
                     serverData.field_78841_f = false;
-                    // serverData.field_78843_h = false;
                 }
             } catch (Exception e) {
                 FentLib.LOG.error("Couldn't load server list (JSON)", e);

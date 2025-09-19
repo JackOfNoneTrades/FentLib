@@ -40,6 +40,7 @@ public class VarInstanceServer {
                 FentLib.LOG.error("Couldn\'t load static server favicon", exception);
             } finally {
                 bytebuf.release();
+                FentLib.LOG.info("Successfully loaded static server icon");
             }
         } else {
             FentLib.LOG.info("Static server icon not found");
@@ -64,6 +65,7 @@ public class VarInstanceServer {
                 String base64 = Base64.getEncoder()
                     .encodeToString(serializedData);
                 animatedFaviconBlob = "data:image/stitched;base64," + base64;
+                FentLib.LOG.info("Successfully loaded animated server icon");
             } catch (Exception e) {
                 FentLib.LOG.error("Couldn't load animated GIF favicon", e);
             }

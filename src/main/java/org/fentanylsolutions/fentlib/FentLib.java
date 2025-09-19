@@ -1,10 +1,6 @@
 package org.fentanylsolutions.fentlib;
 
 import java.io.File;
-import java.util.Iterator;
-
-import javax.imageio.spi.IIORegistry;
-import javax.imageio.spi.ImageReaderSpi;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -55,22 +51,6 @@ public class FentLib {
         DEBUG_MODE = debugVar != null;
         FentLib.LOG.info("Debugmode: {}", DEBUG_MODE);
         proxy.preInit(event);
-
-        for (Iterator<ImageReaderSpi> it = IIORegistry.getDefaultInstance()
-            .getServiceProviders(ImageReaderSpi.class, true); it.hasNext();) {
-            ImageReaderSpi spi = it.next();
-            System.out.println(
-                "ImageReaderSPI: " + spi.getClass()
-                    .getName());
-        }
-
-        // ✅ Confirm it's loaded
-        IIORegistry.getDefaultInstance()
-            .getServiceProviders(javax.imageio.spi.ImageReaderSpi.class, true)
-            .forEachRemaining(
-                spi -> System.out.println(
-                    "ImageReaderSPI (manual): " + spi.getClass()
-                        .getName()));
     }
 
     @Mod.EventHandler
