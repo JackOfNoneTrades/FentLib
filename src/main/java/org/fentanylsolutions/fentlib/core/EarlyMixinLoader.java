@@ -50,6 +50,9 @@ public class EarlyMixinLoader implements IEarlyMixinLoader, IFMLLoadingPlugin {
             .addMixin("FeatureExtraPingData$NetHandlerStatusServerMixin", MiscUtil.Side.BOTH)
             .addMixin("FeatureExtraPingData$MixinServerStatusResponse", MiscUtil.Side.BOTH)
             .addMixin("FeatureExtraPingData$ServerStatusResponseSerializerMixin", MiscUtil.Side.BOTH)
+            .addMixin("FeatureExtraPingData$MixinFMLClientHandler", MiscUtil.Side.BOTH)
+
+            // .addMixin("FeatureExtraPingData$MixinOldServerPinger", MiscUtil.Side.BOTH)
 
             .build();
     }

@@ -16,9 +16,10 @@ public class ClientProxy extends CommonProxy {
       S00PacketServerInfoModifyService.put("i_support_animated_gifs");
       // You can also put String, String pairs or entire JsonElement objects
 
-      S00PacketServerInfoModifyService.registerDeserializeHandler((response, fentlibData) -> {
+      S00PacketServerInfoModifyService.registerDeserializeHandler((response, fentlibData, serverData) -> {
         if (fentlibData.has("i_sent_you_something_back")) {
           // Yoohoo we got something back!!!!
+          // serverData contains stuff like server IP
         }
       });
     }

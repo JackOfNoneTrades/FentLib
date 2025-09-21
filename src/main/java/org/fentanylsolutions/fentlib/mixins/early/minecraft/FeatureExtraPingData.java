@@ -3,6 +3,9 @@ package org.fentanylsolutions.fentlib.mixins.early.minecraft;
 import java.io.IOException;
 import java.lang.reflect.Type;
 
+import net.minecraft.client.multiplayer.ServerAddress;
+import net.minecraft.client.multiplayer.ServerData;
+import net.minecraft.client.network.OldServerPinger;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.ServerStatusResponse;
@@ -13,6 +16,7 @@ import net.minecraft.server.network.NetHandlerStatusServer;
 import org.fentanylsolutions.fentlib.FentLib;
 import org.fentanylsolutions.fentlib.mixininterfaces.IC00PacketServerQuery;
 import org.fentanylsolutions.fentlib.mixininterfaces.IServerStatusResponse;
+import org.fentanylsolutions.fentlib.packet.FentPing;
 import org.fentanylsolutions.fentlib.services.S00PacketServerInfoModifyService;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -22,10 +26,14 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
+
+import cpw.mods.fml.client.FMLClientHandler;
+import io.netty.util.concurrent.GenericFutureListener;
 
 public class FeatureExtraPingData {
 
@@ -49,7 +57,7 @@ public class FeatureExtraPingData {
         private void writeClientCapabilities(PacketBuffer data, CallbackInfo ci) throws IOException {
             String extra = S00PacketServerInfoModifyService.getAsString();
             FentLib.debug("Writing extra data in writePacketData: " + extra);
-            data.writeStringToBuffer(extra);
+            // data.writeStringToBuffer(extra);
         }
 
         @Inject(method = "readPacketData", at = @At("TAIL"))
@@ -140,17 +148,48 @@ public class FeatureExtraPingData {
             if (!(jsonElement instanceof JsonObject)) return;
             JsonObject rootJson = (JsonObject) jsonElement;
             JsonElement fentlibData = rootJson.get(FentLib.MODID);
-
             if (fentlibData == null || !fentlibData.isJsonObject()) return;
-
             ServerStatusResponse response = cir.getReturnValue();
             JsonObject fentlibJson = fentlibData.getAsJsonObject();
-
-            // Store it for access via IServerStatusResponse.getExtraData()
             ((IServerStatusResponse) response).setExtraData(fentlibJson);
+        }
 
-            // Call registered handlers that want to react to extra data
-            S00PacketServerInfoModifyService.callDeserializeHandlers(response);
+    }
+
+    @Mixin(value = FMLClientHandler.class, remap = false)
+    public static class MixinFMLClientHandler {
+
+        @Inject(method = "bindServerListData", at = @At("TAIL"))
+        private void fentlib$handleFentLibDeserialization(ServerData data, ServerStatusResponse originalResponse,
+            CallbackInfo ci) {
+            System.out.println("fentlib$handleFentLibDeserialization hook");
+            JsonElement extra = ((IServerStatusResponse) originalResponse).getExtraData();
+            System.out.println(extra);
+
+            if (extra != null && extra.isJsonObject()) {
+                S00PacketServerInfoModifyService.callDeserializeHandlers(originalResponse, data);
+            }
+        }
+    }
+
+    @Mixin(OldServerPinger.class)
+    public static class MixinOldServerPinger {
+
+        @Inject(
+            method = "func_147224_a",
+            at = @At(
+                value = "INVOKE",
+                target = "Lnet/minecraft/network/NetworkManager;scheduleOutboundPacket(Lnet/minecraft/network/Packet;[Lio/netty/util/concurrent/GenericFutureListener;)V",
+                ordinal = 1),
+            locals = LocalCapture.CAPTURE_FAILHARD)
+        private void injectFentPing(ServerData server, CallbackInfo ci, ServerAddress serverAddress,
+            NetworkManager networkManager) {
+            // Construct your custom FentPing data
+            String extra = "{\"fentlib\":true,\"version\":\"1.0.0\"}";
+            FentPing fentPing = new FentPing(extra);
+
+            // Send your packet before the standard ServerQuery
+            networkManager.scheduleOutboundPacket(fentPing, new GenericFutureListener[0]);
         }
     }
 }

@@ -2,9 +2,9 @@ package org.fentanylsolutions.fentlib.services;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 
+import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.network.ServerStatusResponse;
 
 import org.fentanylsolutions.fentlib.FentLib;
@@ -19,10 +19,16 @@ import com.google.gson.JsonSyntaxException;
 public class S00PacketServerInfoModifyService {
 
     private static final List<BiFunction<ServerStatusResponse, JsonObject, Object>> modifyHandlers = new ArrayList<>();
-    private static final List<BiConsumer<ServerStatusResponse, JsonObject>> deserializeHandlers = new ArrayList<>();
+    private static final List<TriConsumer<ServerStatusResponse, JsonObject, ServerData>> deserializeHandlers = new ArrayList<>();
     private static final Gson gson = new Gson();
 
     private static final JsonObject internalExtraData = new JsonObject();
+
+    @FunctionalInterface
+    public interface TriConsumer<A, B, C> {
+
+        void accept(A a, B b, C c);
+    }
 
     public static class KeyValue {
 
@@ -49,7 +55,7 @@ public class S00PacketServerInfoModifyService {
         modifyHandlers.add((BiFunction<ServerStatusResponse, JsonObject, Object>) handler);
     }
 
-    public static void registerDeserializeHandler(BiConsumer<ServerStatusResponse, JsonObject> handler) {
+    public static void registerDeserializeHandler(TriConsumer<ServerStatusResponse, JsonObject, ServerData> handler) {
         deserializeHandlers.add(handler);
     }
 
@@ -94,12 +100,12 @@ public class S00PacketServerInfoModifyService {
         }
     }
 
-    public static void callDeserializeHandlers(ServerStatusResponse response) {
+    public static void callDeserializeHandlers(ServerStatusResponse response, ServerData serverData) {
         JsonElement extra = ((IServerStatusResponse) response).getExtraData();
         if (extra != null && extra.isJsonObject()) {
-            for (BiConsumer<ServerStatusResponse, JsonObject> handler : deserializeHandlers) {
+            for (TriConsumer<ServerStatusResponse, JsonObject, ServerData> handler : deserializeHandlers) {
                 try {
-                    handler.accept(response, extra.getAsJsonObject());
+                    handler.accept(response, extra.getAsJsonObject(), serverData);
                 } catch (Exception e) {
                     FentLib.LOG.error(
                         "[S00PacketServerInfoModifyService] Deserialize handler threw exception: " + e.getMessage());

@@ -38,6 +38,8 @@ public class CommonProxy {
                 }
                 return null;
             });
+
+            S00PacketServerInfoModifyService.registerHandler((s, j) -> { return FentLib.MODID; });
         }
         Config.loadConfig(FentLib.confFile);
         FentLib.LOG.info("I am Fentlib at version " + Tags.VERSION);

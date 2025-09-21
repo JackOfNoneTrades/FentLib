@@ -192,10 +192,10 @@ public class FeatureAnimatedIcon {
 
         @Inject(method = "func_148297_b", at = @At("HEAD"), cancellable = true)
         private void onFunc148297b(CallbackInfo ci) {
-            // Need to null those fields, otherwise the first reload from a gif to a statuic image will produce a
+            // Need to null those fields, otherwise the first reload from a gif to a static image will produce a
             // corrupted blend of the two.
             field_148305_h = null;
-            field_148306_i = null;
+            // field_148306_i = null;
             String base64 = field_148301_e.getBase64EncodedIconData();
             if (base64 == null || !((IAnimatedServerData) field_148301_e).getIsAnimatedIcon()) {
                 return;
