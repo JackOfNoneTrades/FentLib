@@ -1,15 +1,18 @@
 package org.fentanylsolutions.fentlib.mixins.early.minecraft;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.ServerStatusResponse;
 import net.minecraft.network.status.client.C00PacketServerQuery;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.NetHandlerStatusServer;
 
 import org.fentanylsolutions.fentlib.FentLib;
 import org.fentanylsolutions.fentlib.mixininterfaces.IC00PacketServerQuery;
+import org.fentanylsolutions.fentlib.mixininterfaces.IServerStatusResponse;
 import org.fentanylsolutions.fentlib.services.S00PacketServerInfoModifyService;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -18,6 +21,11 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSerializationContext;
 
 public class FeatureExtraPingData {
 
@@ -91,5 +99,58 @@ public class FeatureExtraPingData {
          * System.out.println("[Mixin] Received Ping Packet: " + packetIn);
          * }
          */
+    }
+
+    @Mixin(ServerStatusResponse.class)
+    public static class MixinServerStatusResponse implements IServerStatusResponse {
+
+        @Unique
+        private JsonElement extraData;
+
+        @Override
+        public void setExtraData(JsonElement extraData) {
+            this.extraData = extraData;
+        }
+
+        @Override
+        public JsonElement getExtraData() {
+            return this.extraData;
+        }
+    }
+
+    @Mixin(ServerStatusResponse.Serializer.class)
+    public static class ServerStatusResponseSerializerMixin {
+
+        @Inject(method = "serialize", at = @At("RETURN"), cancellable = true)
+        private void injectFentLibEnhancement(ServerStatusResponse response, Type type,
+            JsonSerializationContext context, CallbackInfoReturnable<JsonElement> cir) {
+            JsonElement returnValue = cir.getReturnValue();
+            if (!(returnValue instanceof JsonObject)) return;
+            JsonObject json = (JsonObject) returnValue;
+            JsonElement extraData = ((IServerStatusResponse) response).getExtraData();
+            if (extraData != null) {
+                json.add(FentLib.MODID, extraData);
+            }
+            cir.setReturnValue(json);
+        }
+
+        @Inject(method = "deserialize", at = @At("RETURN"))
+        private void interceptFentLibEnhancement(JsonElement jsonElement, Type type,
+            com.google.gson.JsonDeserializationContext context, CallbackInfoReturnable<ServerStatusResponse> cir) {
+            if (!(jsonElement instanceof JsonObject)) return;
+            JsonObject rootJson = (JsonObject) jsonElement;
+            JsonElement fentlibData = rootJson.get(FentLib.MODID);
+
+            if (fentlibData == null || !fentlibData.isJsonObject()) return;
+
+            ServerStatusResponse response = cir.getReturnValue();
+            JsonObject fentlibJson = fentlibData.getAsJsonObject();
+
+            // Store it for access via IServerStatusResponse.getExtraData()
+            ((IServerStatusResponse) response).setExtraData(fentlibJson);
+
+            // Call registered handlers that want to react to extra data
+            S00PacketServerInfoModifyService.callDeserializeHandlers(response);
+        }
     }
 }

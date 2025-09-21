@@ -13,6 +13,6 @@ public class ClientProxy extends CommonProxy {
 
         FentLib.varInstanceClient = new VarInstanceClient();
 
-        S00PacketServerInfoModifyService.put(FentLib.ANIMATED_FEATURE, "1");
+        S00PacketServerInfoModifyService.put(FentLib.ANIMATED_FEATURE);
     }
 }

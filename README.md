@@ -13,8 +13,14 @@ Use the `/reload_icon` command to reload the icon. Also works for `server-icon.p
 public class ClientProxy extends CommonProxy {
     @Override
     public void preInit(FMLPreInitializationEvent event) {
-        S00PacketServerInfoModifyService.put("i_support_animated_gifs", "1");
-        // You can also put more comples JsonElement objects
+      S00PacketServerInfoModifyService.put("i_support_animated_gifs");
+      // You can also put String, String pairs or entire JsonElement objects
+
+      S00PacketServerInfoModifyService.registerDeserializeHandler((response, fentlibData) -> {
+        if (fentlibData.has("i_sent_you_something_back")) {
+          // Yoohoo we got something back!!!!
+        }
+      });
     }
 }
 
@@ -29,6 +35,9 @@ public class CommonProxy {
           FentLib.debug("Client has no support for animated gifs");
           // send normal image
         }
+        return "i_sent_you_something_back";
+        // You can return a String, a S00PacketServerInfoModifyService.KeyValue, or a JsonElement. If you return
+        // a non-null value, it will be passed back to the client
       });
     }
   }

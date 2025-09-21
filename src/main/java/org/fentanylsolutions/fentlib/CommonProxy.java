@@ -36,6 +36,7 @@ public class CommonProxy {
                     FentLib.debug("Data has no animated feature, serving static");
                     response.func_151320_a(FentLib.varInstanceServer.staticFaviconBlob);
                 }
+                return null;
             });
         }
         Config.loadConfig(FentLib.confFile);
