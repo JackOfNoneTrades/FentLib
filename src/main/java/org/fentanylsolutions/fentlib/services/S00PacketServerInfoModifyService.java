@@ -14,15 +14,12 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.google.gson.JsonSyntaxException;
 
 public class S00PacketServerInfoModifyService {
 
-    private static final List<BiFunction<ServerStatusResponse, JsonObject, Object>> modifyHandlers = new ArrayList<>();
+    private static final List<BiFunction<ServerStatusResponse, Boolean, Object>> modifyHandlers = new ArrayList<>();
     private static final List<TriConsumer<ServerStatusResponse, JsonObject, ServerData>> deserializeHandlers = new ArrayList<>();
     private static final Gson gson = new Gson();
-
-    private static final JsonObject internalExtraData = new JsonObject();
 
     @FunctionalInterface
     public interface TriConsumer<A, B, C> {
@@ -51,8 +48,8 @@ public class S00PacketServerInfoModifyService {
      *
      * @param handler A BiConsumer that takes ServerStatusResponse and JsonObject (extraData)
      */
-    public static void registerHandler(BiFunction<ServerStatusResponse, JsonObject, ?> handler) {
-        modifyHandlers.add((BiFunction<ServerStatusResponse, JsonObject, Object>) handler);
+    public static void registerHandler(BiFunction<ServerStatusResponse, Boolean, ?> handler) {
+        modifyHandlers.add((BiFunction<ServerStatusResponse, Boolean, Object>) handler);
     }
 
     public static void registerDeserializeHandler(TriConsumer<ServerStatusResponse, JsonObject, ServerData> handler) {
@@ -62,23 +59,16 @@ public class S00PacketServerInfoModifyService {
     /**
      * Modify the server response using all registered handlers.
      *
-     * @param response     The ServerStatusResponse to modify
-     * @param extraDataRaw A string containing extra JSON data
+     * @param response       The ServerStatusResponse to modify
+     * @param fentLibPresent A string containing extra JSON data
      */
-    public static void modify(ServerStatusResponse response, String extraDataRaw) {
-        JsonObject extraData;
-        try {
-            extraData = gson.fromJson(extraDataRaw, JsonObject.class);
-        } catch (JsonSyntaxException e) {
-            FentLib.LOG.error("[S00PacketServerInfoModifyService] Failed to parse extraData: " + e.getMessage());
-            return;
-        }
+    public static void modify(ServerStatusResponse response, boolean fentLibPresent) {
 
         JsonObject fentlibPayload = new JsonObject();
 
-        for (BiFunction<ServerStatusResponse, JsonObject, Object> handler : modifyHandlers) {
+        for (BiFunction<ServerStatusResponse, Boolean, Object> handler : modifyHandlers) {
             try {
-                Object result = handler.apply(response, extraData);
+                Object result = handler.apply(response, fentLibPresent);
                 if (result != null) {
                     if (result instanceof String) {
                         fentlibPayload.add((String) result, new JsonPrimitive(""));
@@ -113,46 +103,5 @@ public class S00PacketServerInfoModifyService {
                 }
             }
         }
-    }
-
-    // Ingoing data (client to server)
-    /**
-     * Add or replace a string key-value pair.
-     */
-    public static void put(String key, String value) {
-        internalExtraData.addProperty(key, value);
-    }
-
-    public static void put(String key) {
-        put(key, "");
-    }
-
-    /**
-     * Add or replace a primitive value.
-     */
-    public static void put(String key, JsonElement value) {
-        internalExtraData.add(key, value);
-    }
-
-    /**
-     * Remove a field by key.
-     */
-    public static void remove(String key) {
-        internalExtraData.remove(key);
-    }
-
-    /**
-     * Clear all internal extra data.
-     */
-    public static void clear() {
-        internalExtraData.entrySet()
-            .clear();
-    }
-
-    /**
-     * Get the internal extra data as a JSON string.
-     */
-    public static String getAsString() {
-        return gson.toJson(internalExtraData);
     }
 }

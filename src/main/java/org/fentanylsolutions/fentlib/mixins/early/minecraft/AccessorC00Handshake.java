@@ -8,6 +8,7 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 @Mixin(C00Handshake.class)
 public interface AccessorC00Handshake {
 
+    // Gets server IP
     @Accessor
     String getField_149598_b();
 }

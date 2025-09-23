@@ -35,8 +35,6 @@ public class FentLib {
     public static VarInstanceServer varInstanceServer;
     public static VarInstanceCommon varInstanceCommon;
 
-    public static final String ANIMATED_FEATURE = "fent:animated";
-
     @SidedProxy(
         clientSide = MODGROUP + "." + MODID + ".ClientProxy",
         serverSide = MODGROUP + "." + MODID + ".CommonProxy")

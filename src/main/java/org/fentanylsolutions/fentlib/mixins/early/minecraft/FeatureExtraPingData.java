@@ -1,22 +1,23 @@
 package org.fentanylsolutions.fentlib.mixins.early.minecraft;
 
-import java.io.IOException;
 import java.lang.reflect.Type;
 
 import net.minecraft.client.multiplayer.ServerAddress;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.network.OldServerPinger;
+import net.minecraft.network.EnumConnectionState;
 import net.minecraft.network.NetworkManager;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.Packet;
 import net.minecraft.network.ServerStatusResponse;
+import net.minecraft.network.handshake.client.C00Handshake;
 import net.minecraft.network.status.client.C00PacketServerQuery;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.network.NetHandlerHandshakeTCP;
 import net.minecraft.server.network.NetHandlerStatusServer;
 
 import org.fentanylsolutions.fentlib.FentLib;
-import org.fentanylsolutions.fentlib.mixininterfaces.IC00PacketServerQuery;
+import org.fentanylsolutions.fentlib.mixininterfaces.INetworkManager;
 import org.fentanylsolutions.fentlib.mixininterfaces.IServerStatusResponse;
-import org.fentanylsolutions.fentlib.packet.FentPing;
 import org.fentanylsolutions.fentlib.services.S00PacketServerInfoModifyService;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -24,57 +25,22 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
+import com.llamalad7.mixinextras.sugar.Local;
 
 import cpw.mods.fml.client.FMLClientHandler;
+import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 
 public class FeatureExtraPingData {
 
-    @Mixin(C00PacketServerQuery.class)
-    public static class MixinC00PacketServerQuery implements IC00PacketServerQuery {
-
-        @Unique
-        String extraData;
-
-        @Override
-        public String getExtraData() {
-            return this.extraData;
-        }
-
-        @Override
-        public void setExtraData(String data) {
-            this.extraData = data;
-        }
-
-        @Inject(method = "writePacketData", at = @At("TAIL"))
-        private void writeClientCapabilities(PacketBuffer data, CallbackInfo ci) throws IOException {
-            String extra = S00PacketServerInfoModifyService.getAsString();
-            FentLib.debug("Writing extra data in writePacketData: " + extra);
-            // data.writeStringToBuffer(extra);
-        }
-
-        @Inject(method = "readPacketData", at = @At("TAIL"))
-        private void readClientCapabilities(PacketBuffer data, CallbackInfo ci) throws IOException {
-            FentLib.debug("Reading extra data in readPacketData");
-            try {
-                if (data.readableBytes() > 0) {
-                    this.extraData = data.readStringFromBuffer(Integer.MAX_VALUE / 5);
-                    FentLib.debug("Extra data: " + this.extraData);
-                } else {
-                    this.extraData = "";
-                }
-            } catch (Exception e) {
-                this.extraData = "";
-            }
-        }
-    }
+    private static final String FENT_TOKEN = "\0" + FentLib.MODID + "\0";
 
     @Mixin(NetHandlerStatusServer.class)
     public static class NetHandlerStatusServerMixin {
@@ -90,15 +56,16 @@ public class FeatureExtraPingData {
         @Inject(method = "processServerQuery", at = @At("HEAD"))
         private void onProcessServerQuery(C00PacketServerQuery packetIn, CallbackInfo ci) {
             FentLib.debug("[Mixin] Received Server Query Packet: " + packetIn);
-            String extraData = ((IC00PacketServerQuery) packetIn).getExtraData();
-            FentLib.debug("[Mixin] Packet extra data: '" + extraData + "'");
 
-            if (extraData.isEmpty()) {
-                extraData = "{}";
+            boolean fentLibPresent = ((INetworkManager) field_147313_b).isFentClient();
+
+            if (fentLibPresent) {
+                FentLib.debug("Query packet comes from a fentlib client");
+            } else {
+                FentLib.debug("Query packet does not come from a fentlib client");
             }
-
             FentLib.debug("[Mixin] Modifying outbound packet");
-            S00PacketServerInfoModifyService.modify(field_147314_a.func_147134_at(), extraData);
+            S00PacketServerInfoModifyService.modify(field_147314_a.func_147134_at(), fentLibPresent);
         }
 
         /*
@@ -175,21 +142,87 @@ public class FeatureExtraPingData {
     @Mixin(OldServerPinger.class)
     public static class MixinOldServerPinger {
 
-        @Inject(
+        /*
+         * @Inject(
+         * method = "func_147224_a",
+         * at = @At(
+         * value = "INVOKE",
+         * target =
+         * "Lnet/minecraft/network/NetworkManager;scheduleOutboundPacket(Lnet/minecraft/network/Packet;[Lio/netty/util/concurrent/GenericFutureListener;)V",
+         * ordinal = 1),
+         * locals = LocalCapture.CAPTURE_FAILHARD)
+         * private void injectFentPing(ServerData server, CallbackInfo ci, ServerAddress serverAddress,
+         * NetworkManager networkManager) {
+         * // Construct your custom FentPing data
+         * String extra = "{\"fentlib\":true,\"version\":\"1.0.0\"}";
+         * FentPing fentPing = new FentPing(extra);
+         * // Send your packet before the standard ServerQuery
+         * ByteBuf wrapped = Unpooled.buffer();
+         * PacketBuffer buf = new PacketBuffer(wrapped);
+         * try {
+         * buf.writeStringToBuffer("sneed");
+         * } catch (IOException e) {
+         * throw new RuntimeException(e);
+         * }
+         * networkManager.scheduleOutboundPacket(new C17PacketCustomPayload("sneed", buf));
+         * }
+         */
+
+        @Redirect(
             method = "func_147224_a",
             at = @At(
                 value = "INVOKE",
-                target = "Lnet/minecraft/network/NetworkManager;scheduleOutboundPacket(Lnet/minecraft/network/Packet;[Lio/netty/util/concurrent/GenericFutureListener;)V",
-                ordinal = 1),
-            locals = LocalCapture.CAPTURE_FAILHARD)
-        private void injectFentPing(ServerData server, CallbackInfo ci, ServerAddress serverAddress,
-            NetworkManager networkManager) {
-            // Construct your custom FentPing data
-            String extra = "{\"fentlib\":true,\"version\":\"1.0.0\"}";
-            FentPing fentPing = new FentPing(extra);
+                target = "Lnet/minecraft/network/NetworkManager;scheduleOutboundPacket(Lnet/minecraft/network/Packet;[Lio/netty/util/concurrent/GenericFutureListener;)V"))
+        private void redirectScheduleOutboundHandshake(NetworkManager instance, Packet packet,
+            GenericFutureListener<? super Future<? super Void>>[] listeners, @Local ServerAddress serveraddress) {
+            if (packet instanceof C00Handshake handshake) {
+                System.out.println("Sending modified C00Handshake ");
+                String modifiedIp = serveraddress.getIP() + FENT_TOKEN;
+                C00Handshake modified = new C00Handshake(
+                    5,
+                    modifiedIp,
+                    serveraddress.getPort(),
+                    EnumConnectionState.STATUS);
 
-            // Send your packet before the standard ServerQuery
-            networkManager.scheduleOutboundPacket(fentPing, new GenericFutureListener[0]);
+                instance.scheduleOutboundPacket(modified, listeners);
+            } else {
+                instance.scheduleOutboundPacket(packet, listeners);
+            }
+        }
+    }
+
+    @Mixin(NetHandlerHandshakeTCP.class)
+    public static class MixinNetHandlerHandshakeTCP {
+
+        @Shadow
+        @Final
+        NetworkManager field_147386_b;
+
+        @Inject(method = "processHandshake", at = @At("HEAD"))
+        public void onProcessHandshake(C00Handshake packet, CallbackInfo ci) {
+            String serverIpField = ((AccessorC00Handshake) packet).getField_149598_b();
+
+            if (serverIpField.contains(FENT_TOKEN)) {
+                FentLib.debug("Received fent client!");
+                ((INetworkManager) field_147386_b).setFentClient();
+            }
+        }
+    }
+
+    @Mixin(NetworkManager.class)
+    public static class MixinNetworkManager implements INetworkManager {
+
+        @Unique
+        private boolean isFentClient = false;
+
+        @Override
+        public boolean isFentClient() {
+            return isFentClient;
+        }
+
+        @Override
+        public void setFentClient() {
+            isFentClient = true;
         }
     }
 }
