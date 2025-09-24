@@ -1,6 +1,7 @@
 package org.fentanylsolutions.fentlib.util;
 
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.launchwrapper.Launch;
 
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.FMLLaunchHandler;
@@ -74,5 +75,9 @@ public class MiscUtil {
             }
         }
         return res;
+    }
+
+    public static boolean isObfuscatedEnv() {
+        return !(Boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment");
     }
 }

@@ -35,8 +35,13 @@
  */
 dependencies {
     runtimeOnlyNonPublishable("com.github.GTNewHorizons:NotEnoughItems:2.7.4-GTNH:dev")
-    runtimeOnlyNonPublishable("com.github.GTNewHorizons:Hodgepodge:2.6.102:dev")
-    // api("com.github.GTNewHorizons:EnderCore:0.4.8:dev")
+    api("com.github.GTNewHorizons:Hodgepodge:2.6.107:dev")
+
+    // we will test font shenanigans with it
+    //api("com.github.GTNewHorizons:Angelica:1.0.0-beta56:dev")
+
+    //api("club.heiqi:qz_fontrender:1.4.3:dev")
+
     // api(rfg.deobf("maven.modrinth:carbon-config:ttXTOUmO"))
 
     compileOnly(rfg.deobf("curse.maven:endercore-231868:4671288"))

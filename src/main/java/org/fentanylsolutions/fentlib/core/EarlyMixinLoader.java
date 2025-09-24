@@ -1,23 +1,17 @@
 package org.fentanylsolutions.fentlib.core;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.fentanylsolutions.fentlib.FentLib;
 import org.fentanylsolutions.fentlib.util.MiscUtil;
 import org.fentanylsolutions.fentlib.util.MixinUtil;
 
-import com.gtnewhorizon.gtnhmixins.IEarlyMixinLoader;
-
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
 
 @SuppressWarnings("unused")
 @IFMLLoadingPlugin.MCVersion("1.7.10")
-public class EarlyMixinLoader implements IEarlyMixinLoader, IFMLLoadingPlugin {
-
-    private final List<String> specialIds = Arrays.asList("fml", "mcp", "minecraft", "minecraftforge");
+public class EarlyMixinLoader extends FentEarlyMixinLoader {
 
     @Override
     public String getMixinConfig() {
@@ -57,28 +51,5 @@ public class EarlyMixinLoader implements IEarlyMixinLoader, IFMLLoadingPlugin {
             .addMixin("FeatureExtraPingData$MixinNetworkManager", MiscUtil.Side.BOTH)
 
             .build();
-    }
-
-    @Override
-    public String[] getASMTransformerClass() {
-        return null;
-    }
-
-    @Override
-    public String getModContainerClass() {
-        return null;
-    }
-
-    @Override
-    public String getSetupClass() {
-        return null;
-    }
-
-    @Override
-    public void injectData(Map<String, Object> data) {}
-
-    @Override
-    public String getAccessTransformerClass() {
-        return null;
     }
 }
