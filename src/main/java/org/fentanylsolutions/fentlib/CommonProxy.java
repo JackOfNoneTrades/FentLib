@@ -1,7 +1,6 @@
 package org.fentanylsolutions.fentlib;
 
 import org.fentanylsolutions.fentlib.command.CommandReloadServerIcon;
-import org.fentanylsolutions.fentlib.eventlisteners.CustomPayloadListener;
 import org.fentanylsolutions.fentlib.services.S00PacketServerInfoModifyService;
 import org.fentanylsolutions.fentlib.util.MiscUtil;
 import org.fentanylsolutions.fentlib.varinstances.VarInstanceCommon;
@@ -11,8 +10,6 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
-import cpw.mods.fml.common.network.FMLEventChannel;
-import cpw.mods.fml.common.network.NetworkRegistry;
 
 public class CommonProxy {
 
@@ -43,9 +40,6 @@ public class CommonProxy {
             });
 
             S00PacketServerInfoModifyService.registerHandler((s, j) -> { return FentLib.MODID; });
-
-            FMLEventChannel channel = NetworkRegistry.INSTANCE.newEventDrivenChannel("sneed");
-            channel.register(new CustomPayloadListener());
         }
         Config.loadConfig(FentLib.confFile);
         FentLib.LOG.info("I am Fentlib at version " + Tags.VERSION);

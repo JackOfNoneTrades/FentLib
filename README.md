@@ -8,16 +8,13 @@ A shared code library and tweak/fix mod.
 ![animated_server_icons](images/animated_server_icons.gif)
 Use the `/reload_icon` command to reload the icon. Also works for `server-icon.png`.
 * Removal of EnderCore / HodgePodge Info Button in the mod list screen.
-* API to pass additional data in the `C00PacketServerQuery` packet (e.g. list your client capabilities), and modify the `S00PacketServerInfo` packet accordingly. Example:
+* API to modify the `S00PacketServerInfo` packet. Example:
 ```java
 public class ClientProxy extends CommonProxy {
     @Override
     public void preInit(FMLPreInitializationEvent event) {
-      S00PacketServerInfoModifyService.put("i_support_animated_gifs");
-      // You can also put String, String pairs or entire JsonElement objects
-
       S00PacketServerInfoModifyService.registerDeserializeHandler((response, fentlibData, serverData) -> {
-        if (fentlibData.has("i_sent_you_something_back")) {
+        if (fentlibData.has("server_to_client_payload")) {
           // Yoohoo we got something back!!!!
           // serverData contains stuff like server IP
         }
@@ -28,15 +25,9 @@ public class ClientProxy extends CommonProxy {
 public class CommonProxy {
   public void preInit(FMLPreInitializationEvent event) {
     if (MiscUtil.isServer()) {
-      S00PacketServerInfoModifyService.registerHandler((response, data) -> {
-        if (data.has("i_support_animated_gifs")) {
-          FentLib.debug("Client has support for animated gifs!");
-          // send animated gif
-        } else {
-          FentLib.debug("Client has no support for animated gifs");
-          // send normal image
-        }
-        return "i_sent_you_something_back";
+      S00PacketServerInfoModifyService.registerHandler((response, fentLibPresent) -> {
+        // fentLibPresent is just a boolean indicating whether fentlib is loaded
+        return "server_to_client_payload";
         // You can return a String, a S00PacketServerInfoModifyService.KeyValue, or a JsonElement. If you return
         // a non-null value, it will be passed back to the client
       });

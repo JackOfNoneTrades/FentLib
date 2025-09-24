@@ -98,7 +98,7 @@ public class Config {
 
             FentLib.varInstanceCommon.buildPassiveMobList();
         } catch (Exception e) {
-            System.err.println("Error loading config: " + e.getMessage());
+            FentLib.LOG.error("Error loading config: ", e);
         } finally {
             config.save();
         }

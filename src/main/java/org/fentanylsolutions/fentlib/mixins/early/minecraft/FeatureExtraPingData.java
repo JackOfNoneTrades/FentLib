@@ -89,6 +89,9 @@ public class FeatureExtraPingData {
 
         @Override
         public JsonElement getExtraData() {
+            if (this.extraData == null) {
+                return new JsonObject();
+            }
             return this.extraData;
         }
     }
@@ -129,9 +132,9 @@ public class FeatureExtraPingData {
         @Inject(method = "bindServerListData", at = @At("TAIL"))
         private void fentlib$handleFentLibDeserialization(ServerData data, ServerStatusResponse originalResponse,
             CallbackInfo ci) {
-            System.out.println("fentlib$handleFentLibDeserialization hook");
+            FentLib.debug("fentlib$handleFentLibDeserialization hook");
             JsonElement extra = ((IServerStatusResponse) originalResponse).getExtraData();
-            System.out.println(extra);
+            FentLib.debug(extra == null ? "null" : ((JsonElement) extra).toString());
 
             if (extra != null && extra.isJsonObject()) {
                 S00PacketServerInfoModifyService.callDeserializeHandlers(originalResponse, data);
@@ -176,7 +179,7 @@ public class FeatureExtraPingData {
         private void redirectScheduleOutboundHandshake(NetworkManager instance, Packet packet,
             GenericFutureListener<? super Future<? super Void>>[] listeners, @Local ServerAddress serveraddress) {
             if (packet instanceof C00Handshake handshake) {
-                System.out.println("Sending modified C00Handshake ");
+                FentLib.debug("Sending modified C00Handshake ");
                 String modifiedIp = serveraddress.getIP() + FENT_TOKEN;
                 C00Handshake modified = new C00Handshake(
                     5,

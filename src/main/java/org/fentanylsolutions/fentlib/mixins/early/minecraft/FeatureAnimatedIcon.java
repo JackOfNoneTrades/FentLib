@@ -251,6 +251,10 @@ public class FeatureAnimatedIcon {
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;func_146110_a(IIFFIIFF)V", ordinal = 1))
         private void redirectServerIconDraw(int x, int y, float u, float v, int width, int height, float texWidth,
             float texHeight, Operation original) {
+            if (!((IAnimatedServerData) field_148301_e).getIsAnimatedIcon()) {
+                original.call(x, y, u, v, width, height, texWidth, texHeight);
+                return;
+            }
             GifUtil.StitchedAnimationData stitchedData = ((IAnimatedServerData) field_148301_e)
                 .getStitchedAnimationData();
 
