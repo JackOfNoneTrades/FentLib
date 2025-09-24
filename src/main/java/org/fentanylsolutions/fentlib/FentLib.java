@@ -86,6 +86,8 @@ public class FentLib {
      * .................▄▌........
      */
 
-    // TODO: Make the mod menu scrollable only in the list area. Don't forgor separate mixin for hodgepodge and vanilla
+    // TODO:
+    // * Make the mod menu scrollable only in the list area. Don't forgor separate mixin for hodgepodge and vanilla
     // endercore
+    // * Clickable MOTD links
 }
