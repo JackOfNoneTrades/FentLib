@@ -28,6 +28,8 @@ public class LateMixinLoader implements ILateMixinLoader {
     public List<String> getMixins(Set<String> loadedCoreMods) {
         return new MixinUtil.MixinBuilder().addMixin("MixinGuiEnhancedModList", MiscUtil.Side.CLIENT, "enderio")
             .addMixin("MixinRemoveInfoButton", MiscUtil.Side.CLIENT, "fml")
+            .addMixin("NEIOverrideMixin", MiscUtil.Side.CLIENT, "modularui2")
+            .addMixin("MixinModularPanel", MiscUtil.Side.CLIENT, "modularui2")
             .build();
     }
 }
