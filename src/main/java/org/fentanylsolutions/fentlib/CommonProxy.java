@@ -1,6 +1,7 @@
 package org.fentanylsolutions.fentlib;
 
 import org.fentanylsolutions.fentlib.command.CommandReloadServerIcon;
+import org.fentanylsolutions.fentlib.compat.LoadedMods;
 import org.fentanylsolutions.fentlib.services.S00PacketServerInfoModifyService;
 import org.fentanylsolutions.fentlib.util.MiscUtil;
 import org.fentanylsolutions.fentlib.varinstances.VarInstanceCommon;
@@ -16,6 +17,7 @@ public class CommonProxy {
     // preInit "Run before anything else. Read your config, create blocks, items, etc, and register them with the
     // GameRegistry." (Remove if not needed)
     public void preInit(FMLPreInitializationEvent event) {
+        LoadedMods.init();
         FentLib.varInstanceCommon = new VarInstanceCommon();
         if (MiscUtil.isServer()) {
             FentLib.varInstanceServer = new VarInstanceServer();

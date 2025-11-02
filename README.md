@@ -64,3 +64,6 @@ public class CommonProxy {
 <br>
 
 ![license](images/lgplsneed_small.png)
+
+TODO:
+* Still generate the vanilla server dat for multimc compat
