@@ -1,7 +1,9 @@
 package org.fentanylsolutions.fentlib;
 
+import org.fentanylsolutions.fentlib.command.CommandDumpThaumonomicon;
 import org.fentanylsolutions.fentlib.command.CommandReloadServerIcon;
 import org.fentanylsolutions.fentlib.compat.LoadedMods;
+import org.fentanylsolutions.fentlib.packet.PacketHandler;
 import org.fentanylsolutions.fentlib.services.S00PacketServerInfoModifyService;
 import org.fentanylsolutions.fentlib.util.MiscUtil;
 import org.fentanylsolutions.fentlib.varinstances.VarInstanceCommon;
@@ -44,6 +46,9 @@ public class CommonProxy {
             S00PacketServerInfoModifyService.registerHandler((s, j) -> { return FentLib.MODID; });
         }
         Config.loadConfig(FentLib.confFile);
+
+        PacketHandler.initPackets();
+
         FentLib.LOG.info("I am Fentlib at version " + Tags.VERSION);
     }
 
@@ -60,5 +65,6 @@ public class CommonProxy {
     // register server commands in this event handler (Remove if not needed)
     public void serverStarting(FMLServerStartingEvent event) {
         event.registerServerCommand(new CommandReloadServerIcon());
+        event.registerServerCommand(new CommandDumpThaumonomicon());
     }
 }

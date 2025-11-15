@@ -22,16 +22,19 @@ public class FileUtil {
         writer.close();
     }
 
-    public static File createFolderIfNotExists(String path) {
-        File folder = new File(path);
+    public static File createFolderIfNotExists(File folder) {
         if (!folder.exists()) {
             boolean created = folder.mkdirs();
             if (!created) {
-                FentLib.LOG.error("Failed to create directory {}", path);
+                FentLib.LOG.error("Failed to create directory {}", folder.getName());
                 return null;
             }
         }
         return folder;
+    }
+
+    public static File createFolderIfNotExists(String path) {
+        return createFolderIfNotExists(new File(path));
     }
 
     public static File createFolderIfNotExists(String path1, String path2) {
@@ -44,5 +47,17 @@ public class FileUtil {
         return createFolderIfNotExists(
             Paths.get(path1.getPath(), path2)
                 .toString());
+    }
+
+    public static void deleteDirectory(File directory) {
+        if (directory.isDirectory()) {
+            File[] files = directory.listFiles();
+            if (files != null) {
+                for (File file : files) {
+                    deleteDirectory(file);
+                }
+            }
+        }
+        directory.delete();
     }
 }

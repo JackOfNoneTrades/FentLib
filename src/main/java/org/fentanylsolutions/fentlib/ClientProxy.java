@@ -4,6 +4,7 @@ import org.fentanylsolutions.fentlib.services.S00PacketServerInfoModifyService;
 import org.fentanylsolutions.fentlib.varinstances.VarInstanceClient;
 
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.event.FMLServerStartingEvent;
 
 public class ClientProxy extends CommonProxy {
 
@@ -20,5 +21,10 @@ public class ClientProxy extends CommonProxy {
                 FentLib.debug("Fentlib not detected for server @ " + serverData.serverIP);
             }
         });
+    }
+
+    @Override
+    public void serverStarting(FMLServerStartingEvent event) {
+        super.serverStarting(event);
     }
 }

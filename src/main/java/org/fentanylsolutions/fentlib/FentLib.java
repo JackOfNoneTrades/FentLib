@@ -47,8 +47,10 @@ public class FentLib {
         confFile = event.getSuggestedConfigurationFile();
         String debugVar = System.getenv("MCMODDING_DEBUG_MODE");
         DEBUG_MODE = debugVar != null;
-        FentLib.LOG.info("Debugmode: {}", DEBUG_MODE);
+        FentLib.LOG.info("DEBUGMODE env var: {}", DEBUG_MODE);
         proxy.preInit(event);
+        FentLib.LOG.info("debugMode config option: {}", Config.debugMode);
+        FentLib.LOG.info("isDebugMode: {}", isDebugMode());
     }
 
     @Mod.EventHandler
