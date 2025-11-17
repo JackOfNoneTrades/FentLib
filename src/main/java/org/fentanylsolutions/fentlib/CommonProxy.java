@@ -9,10 +9,7 @@ import org.fentanylsolutions.fentlib.util.MiscUtil;
 import org.fentanylsolutions.fentlib.varinstances.VarInstanceCommon;
 import org.fentanylsolutions.fentlib.varinstances.VarInstanceServer;
 
-import cpw.mods.fml.common.event.FMLInitializationEvent;
-import cpw.mods.fml.common.event.FMLPostInitializationEvent;
-import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import cpw.mods.fml.common.event.FMLServerStartingEvent;
+import cpw.mods.fml.common.event.*;
 
 public class CommonProxy {
 
@@ -66,5 +63,9 @@ public class CommonProxy {
     public void serverStarting(FMLServerStartingEvent event) {
         event.registerServerCommand(new CommandReloadServerIcon());
         event.registerServerCommand(new CommandDumpThaumonomicon());
+    }
+
+    public void serverStarting(FMLServerStartedEvent event) {
+        System.out.println("SERVER STARTED");
     }
 }
