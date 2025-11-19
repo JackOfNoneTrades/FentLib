@@ -1,5 +1,6 @@
 package org.fentanylsolutions.fentlib;
 
+import net.minecraft.client.Minecraft;
 import net.minecraftforge.common.MinecraftForge;
 
 import org.fentanylsolutions.fentlib.misc.AutomatorEventHandler;
@@ -7,6 +8,7 @@ import org.fentanylsolutions.fentlib.services.S00PacketServerInfoModifyService;
 import org.fentanylsolutions.fentlib.varinstances.VarInstanceClient;
 
 import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 
@@ -15,6 +17,7 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void preInit(FMLPreInitializationEvent event) {
         super.preInit(event);
+        AutomatorEventHandler.tailLog();
 
         FentLib.varInstanceClient = new VarInstanceClient();
 
@@ -33,7 +36,14 @@ public class ClientProxy extends CommonProxy {
                 .bus()
                 .register(lol);
             MinecraftForge.EVENT_BUS.register(lol);
+            Minecraft.getMinecraft().gameSettings.pauseOnLostFocus = false;
         }
+    }
+
+    @Override
+    public void postInit(FMLPostInitializationEvent event) {
+        super.postInit(event);
+
     }
 
     @Override
