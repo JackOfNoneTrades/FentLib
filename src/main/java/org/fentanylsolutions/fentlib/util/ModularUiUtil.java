@@ -5,7 +5,6 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiScreen;
 
 import org.fentanylsolutions.fentlib.mixininterfaces.IModularPanel;
-import org.fentanylsolutions.fentlib.mixins.late.modularui2.AccessorWidget;
 
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.screen.ModularPanel;
@@ -18,7 +17,7 @@ public class ModularUiUtil {
             return null;
         }
 
-        String debugName = ((AccessorWidget) widget).getDebugName();
+        String debugName = widget.getName();
         if (debugName != null && debugName.equals(name)) {
             return widget;
         }
