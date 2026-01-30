@@ -6,6 +6,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Paths;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.server.MinecraftServer;
+
 import org.fentanylsolutions.fentlib.FentLib;
 
 public class FileUtil {
@@ -59,5 +62,31 @@ public class FileUtil {
             }
         }
         directory.delete();
+    }
+
+    public static String hashStringBlob(String blob) {
+        // Simple hash - SHA-1 of the string bytes
+        try {
+            java.security.MessageDigest md = java.security.MessageDigest.getInstance("SHA-1");
+            byte[] digest = md.digest(blob.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            StringBuilder sb = new StringBuilder();
+            for (byte b : digest) {
+                sb.append(String.format("%02x", b));
+            }
+            return sb.toString();
+        } catch (Exception e) {
+            // Fallback to simple hashCode if SHA-1 fails
+            return Integer.toHexString(blob.hashCode());
+        }
+    }
+
+    public static File getMinecraftDir() {
+        if (MiscUtil.isServer()) {
+            return new File(
+                MinecraftServer.getServer()
+                    .getFolderName());
+        } else {
+            return Minecraft.getMinecraft().mcDataDir;
+        }
     }
 }

@@ -21,6 +21,7 @@ import net.minecraft.util.ResourceLocation;
 import org.apache.logging.log4j.Logger;
 import org.fentanylsolutions.fentlib.FentLib;
 import org.fentanylsolutions.fentlib.mixininterfaces.IAnimatedServerData;
+import org.fentanylsolutions.fentlib.util.FileUtil;
 import org.fentanylsolutions.fentlib.util.GifUtil;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -53,19 +54,85 @@ public class FeatureAnimatedIcon {
 
         @Inject(method = "getNBTCompound", at = @At("RETURN"))
         private void saveAnimatedIcon(CallbackInfoReturnable<NBTTagCompound> cir) {
+            FentLib.debug("MixinServerData:saveAnimatedIcon hook");
+            FentLib.debug("animatedIcon: " + this.isAnimatedIcon);
             NBTTagCompound nbtCompound = cir.getReturnValue();
             nbtCompound.setBoolean("animatedIcon", this.isAnimatedIcon);
+
+            if (this.isAnimatedIcon) {
+                ServerData self = (ServerData) (Object) this;
+                String blob = self.getBase64EncodedIconData();
+                if (blob != null) {
+                    FentLib.debug("getBase64EncodedIconData() size: " + blob.length());
+                    // Hash the blob, save to file
+                    String hash = FileUtil.hashStringBlob(blob);
+                    saveIconToFile(hash, blob);
+                    // Replace the big GIF b64 with a reference to the hash
+                    nbtCompound.setString("animatedIconHash", "gif:" + hash);
+                    FentLib.debug("Saved icon as " + hash);
+                } else {
+                    FentLib.debug("getBase64EncodedIconData() is null");
+                }
+                nbtCompound.removeTag("icon");
+            }
+        }
+
+        @Unique
+        private static void saveIconToFile(String hash, String blob) {
+            try {
+                File file = new File(FentLib.varInstanceClient.serverIconDir, hash);
+                java.nio.file.Files.write(file.toPath(), blob.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                FentLib.debug("[saveIconToFile] Saved animated icon to: " + file.getAbsolutePath());
+            } catch (Exception e) {
+                FentLib.LOG.error("Failed to save animated icon", e);
+            }
+        }
+
+        @Unique
+        private static String loadIconFromFile(String hash) {
+            try {
+                File file = new File(FentLib.varInstanceClient.serverIconDir, hash);
+                if (!file.exists()) {
+                    return null;
+                }
+                return new String(
+                    java.nio.file.Files.readAllBytes(file.toPath()),
+                    java.nio.charset.StandardCharsets.UTF_8);
+            } catch (Exception e) {
+                FentLib.LOG.error("Failed to load animated icon", e);
+                return null;
+            }
         }
 
         @Inject(method = "getServerDataFromNBTCompound", at = @At("RETURN"))
         private static void loadAnimatedIcon(NBTTagCompound nbtCompound, CallbackInfoReturnable<ServerData> cir) {
+            FentLib.debug("MixinServerData:loadAnimatedIcon hook");
             ServerData serverData = cir.getReturnValue();
-            MixinServerData mixinServerData = (MixinServerData) (Object) serverData;
-            if (nbtCompound.hasKey("animatedIcon")) {
-                mixinServerData.isAnimatedIcon = nbtCompound.getBoolean("animatedIcon");
-                FentLib.debug("nbtCompound has animatedIcon key with value " + mixinServerData.isAnimatedIcon);
+            IAnimatedServerData animated = (IAnimatedServerData) serverData;
+
+            String animatedIconHash = nbtCompound.getString("animatedIconHash");
+            // nbtCompound.getString returns an empty string if entry not found...
+            if (!animatedIconHash.isEmpty()) {
+                FentLib.debug("Got animatedIconHash: " + animatedIconHash);
+                String hash = animatedIconHash.substring(4);
+                String blob = loadIconFromFile(hash);
+                if (blob != null) {
+                    serverData.func_147407_a(blob); // Restore actual blob to memory
+                    animated.setIsAnimatedIcon(true);
+                    FentLib.debug("Loaded animated icon from file: " + hash);
+                } else {
+                    // File missing, clear icon
+                    serverData.func_147407_a(null);
+                    animated.setIsAnimatedIcon(false);
+                    FentLib.LOG.warn("Animated icon file missing: {}", hash);
+                }
             } else {
-                mixinServerData.isAnimatedIcon = false;
+                FentLib.debug("animatedIconHash is null");
+            }
+            if (nbtCompound.hasKey("animatedIcon")) {
+                animated.setIsAnimatedIcon(nbtCompound.getBoolean("animatedIcon"));
+            } else {
+                animated.setIsAnimatedIcon(false);
             }
         }
 

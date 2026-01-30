@@ -35,14 +35,15 @@
  */
 dependencies {
     runtimeOnlyNonPublishable("com.github.GTNewHorizons:NotEnoughItems:2.8.58-GTNH:dev")
-   // api("com.github.GTNewHorizons:Hodgepodge:2.7.56:dev")
+    // api("com.github.GTNewHorizons:Hodgepodge:2.7.56:dev")
+    // https://nexus.gtnewhorizons.com/service/rest/repository/browse/public/com/github/GTNewHorizons/ModularUI2/
     api("com.github.GTNewHorizons:ModularUI2:2.3.28-1.7.10:dev")
     implementation("org.jetbrains:annotations:26.0.2")
 
     // we will test font shenanigans with it
-    //api("com.github.GTNewHorizons:Angelica:2.0.0-alpha16:dev")
+    // api("com.github.GTNewHorizons:Angelica:2.0.0-alpha16:dev")
 
-    //api("club.heiqi:qz_fontrender:1.4.3:dev")
+    // api("club.heiqi:qz_fontrender:1.4.3:dev")
 
     // api(rfg.deobf("maven.modrinth:carbon-config:ttXTOUmO"))
 
@@ -60,5 +61,5 @@ dependencies {
     shadowCompile("com.sksamuel.scrimage:scrimage-core:4.4.0-fent")
 
     compileOnly(rfg.deobf("curse.maven:thaumcraft-223628:2227552")) {transitive=false}
-    //runtimeOnlyNonPublishable('com.github.GTNewHorizons:ForbiddenMagic:0.9.7-GTNH:dev') {exclude module: "Baubles" }
+    // runtimeOnlyNonPublishable('com.github.GTNewHorizons:ForbiddenMagic:0.9.7-GTNH:dev') {exclude module: "Baubles" }
 }

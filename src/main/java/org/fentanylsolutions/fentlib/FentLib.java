@@ -35,6 +35,8 @@ public class FentLib {
     public static VarInstanceServer varInstanceServer;
     public static VarInstanceCommon varInstanceCommon;
 
+    public static File fentlibDir;
+
     @SidedProxy(
         clientSide = MODGROUP + "." + MODID + ".ClientProxy",
         serverSide = MODGROUP + "." + MODID + ".CommonProxy")
@@ -47,7 +49,7 @@ public class FentLib {
         confFile = event.getSuggestedConfigurationFile();
         String debugVar = System.getenv("MCMODDING_DEBUG_MODE");
         DEBUG_MODE = debugVar != null;
-        FentLib.LOG.info("DEBUGMODE env var: {}", DEBUG_MODE);
+        FentLib.LOG.info("MCMODDING_DEBUG_MODE env var: {}", DEBUG_MODE);
         proxy.preInit(event);
         FentLib.LOG.info("debugMode config option: {}", Config.debugMode);
         FentLib.LOG.info("isDebugMode: {}", isDebugMode());

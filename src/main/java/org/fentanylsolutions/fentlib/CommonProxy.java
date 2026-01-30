@@ -1,10 +1,13 @@
 package org.fentanylsolutions.fentlib;
 
+import java.io.File;
+
 import org.fentanylsolutions.fentlib.command.CommandDumpThaumonomicon;
 import org.fentanylsolutions.fentlib.command.CommandReloadServerIcon;
 import org.fentanylsolutions.fentlib.compat.LoadedMods;
 import org.fentanylsolutions.fentlib.packet.PacketHandler;
 import org.fentanylsolutions.fentlib.services.S00PacketServerInfoModifyService;
+import org.fentanylsolutions.fentlib.util.FileUtil;
 import org.fentanylsolutions.fentlib.util.MiscUtil;
 import org.fentanylsolutions.fentlib.varinstances.VarInstanceCommon;
 import org.fentanylsolutions.fentlib.varinstances.VarInstanceServer;
@@ -51,6 +54,12 @@ public class CommonProxy {
         PacketHandler.initPackets();
 
         FentLib.LOG.info("I am Fentlib at version " + Tags.VERSION);
+
+        FentLib.fentlibDir = new File(FileUtil.getMinecraftDir(), FentLib.MODID);
+        if (!FentLib.fentlibDir.exists()) {
+            FentLib.fentlibDir.mkdirs();
+        }
+        FentLib.LOG.info("fentlibDir is located at {}", FentLib.fentlibDir);
     }
 
     // load "Do your mod setup. Build whatever data structures you care about. Register recipes." (Remove if not needed)

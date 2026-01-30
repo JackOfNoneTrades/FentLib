@@ -38,6 +38,8 @@ public class ClientProxy extends CommonProxy {
             MinecraftForge.EVENT_BUS.register(lol);
             Minecraft.getMinecraft().gameSettings.pauseOnLostFocus = false;
         }
+
+        FentLib.varInstanceClient.preinitHook();
     }
 
     @Override
