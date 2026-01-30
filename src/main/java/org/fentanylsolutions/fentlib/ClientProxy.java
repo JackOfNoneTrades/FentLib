@@ -1,6 +1,13 @@
 package org.fentanylsolutions.fentlib;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+
 import net.minecraft.client.Minecraft;
+import net.minecraft.nbt.CompressedStreamTools;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraftforge.common.MinecraftForge;
 
 import org.fentanylsolutions.fentlib.misc.AutomatorEventHandler;
@@ -40,6 +47,7 @@ public class ClientProxy extends CommonProxy {
         }
 
         FentLib.varInstanceClient.preinitHook();
+        cleanOrphanServerGifIcons();
     }
 
     @Override
@@ -51,5 +59,36 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void serverStarting(FMLServerStartingEvent event) {
         super.serverStarting(event);
+    }
+
+    private void cleanOrphanServerGifIcons() {
+        try {
+            NBTTagCompound nbttagcompound = CompressedStreamTools
+                .read(new File(Minecraft.getMinecraft().mcDataDir, "servers.dat"));
+            if (nbttagcompound == null) {
+                return;
+            }
+            NBTTagList nbttaglist = nbttagcompound.getTagList("servers", 10);
+            ArrayList<String> referencedHashes = new ArrayList<>();
+            for (int i = 0; i < nbttaglist.tagCount(); i++) {
+                NBTTagCompound nbtCompound = nbttaglist.getCompoundTagAt(i);
+                String animatedIconHash = nbtCompound.getString("animatedIconHash");
+                if (animatedIconHash.startsWith("gif:")) {
+                    referencedHashes.add(animatedIconHash.substring(4));
+                }
+            }
+            File[] iconFiles = FentLib.varInstanceClient.serverIconDir.listFiles();
+            if (iconFiles == null) {
+                return;
+            }
+            for (File f : iconFiles) {
+                if (!referencedHashes.contains(f.getName())) {
+                    f.delete();
+                    FentLib.LOG.info("Cleaned up orphaned icon {}", f.getName());
+                }
+            }
+        } catch (IOException e) {
+            FentLib.LOG.info("servers.dat not found");
+        }
     }
 }

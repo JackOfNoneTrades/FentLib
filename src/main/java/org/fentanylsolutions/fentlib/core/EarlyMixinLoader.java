@@ -30,7 +30,6 @@ public class EarlyMixinLoader extends FentEarlyMixinLoader {
 
             // Rest
             .addMixin("EntityLivingBaseMixin", MiscUtil.Side.BOTH)
-            // .addMixin("FeatureSaveServerDataAsJson$MixinSaveAsJson", MiscUtil.Side.CLIENT)
 
             .addMixin("MixinJarDiscoverer", MiscUtil.Side.BOTH, "fml")
 
