@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.nio.file.Paths;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.launchwrapper.Launch;
 import net.minecraft.server.MinecraftServer;
 
 import org.fentanylsolutions.fentlib.FentLib;
@@ -82,9 +83,21 @@ public class FileUtil {
 
     public static File getMinecraftDir() {
         if (MiscUtil.isServer()) {
-            return new File(
-                MinecraftServer.getServer()
-                    .getFolderName());
+            MinecraftServer server = MinecraftServer.getServer();
+            if (server != null) {
+                File serverBaseDir = server.getFile("");
+                if (serverBaseDir != null) {
+                    return serverBaseDir;
+                }
+            }
+            if (Launch.minecraftHome != null) {
+                return Launch.minecraftHome;
+            }
+            String userDir = System.getProperty("user.dir");
+            if (userDir != null && !userDir.isEmpty()) {
+                return new File(userDir);
+            }
+            return new File(".");
         } else {
             return Minecraft.getMinecraft().mcDataDir;
         }
