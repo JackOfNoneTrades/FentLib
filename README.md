@@ -37,7 +37,7 @@ public class CommonProxy {
 ```
 * `/dump_thaumonomicon <Optional Comment>` command. Run it from the client, and all Thaumcraft research will be dumped as a static website. The comment will be visible under the page title, and you can indicate the pack or mods for with which the dump was done.
 ![Dump example](images/dumper_example.png)
-* More to come!
+* `/warpdim` [dimension ID] command. Painlessly warp to a dimension (meant for debugging).
 
 ## Downloads
 <!--* [CurseForge ![curse](images/icons/curse.png)](https://www.curseforge.com/minecraft/mc-mods/fentlib)

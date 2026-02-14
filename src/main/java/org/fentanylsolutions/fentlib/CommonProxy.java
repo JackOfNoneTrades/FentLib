@@ -4,6 +4,7 @@ import java.io.File;
 
 import org.fentanylsolutions.fentlib.command.CommandDumpThaumonomicon;
 import org.fentanylsolutions.fentlib.command.CommandReloadServerIcon;
+import org.fentanylsolutions.fentlib.command.CommandWarpDim;
 import org.fentanylsolutions.fentlib.compat.LoadedMods;
 import org.fentanylsolutions.fentlib.packet.PacketHandler;
 import org.fentanylsolutions.fentlib.services.S00PacketServerInfoModifyService;
@@ -76,6 +77,7 @@ public class CommonProxy {
     public void serverStarting(FMLServerStartingEvent event) {
         event.registerServerCommand(new CommandReloadServerIcon());
         event.registerServerCommand(new CommandDumpThaumonomicon());
+        event.registerServerCommand(new CommandWarpDim());
     }
 
     public void serverStarting(FMLServerStartedEvent event) {

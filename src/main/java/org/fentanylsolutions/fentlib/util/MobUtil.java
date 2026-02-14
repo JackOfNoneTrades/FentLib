@@ -22,15 +22,6 @@ public class MobUtil {
         FentLib.LOG.info("=============================");
     }
 
-    public static String getClassByName(String name) {
-        Object res = EntityList.stringToClassMapping.get(name);
-        if (res != null) {
-
-            return ((Class) res).getCanonicalName();
-        }
-        return null;
-    }
-
     public static <T extends ItemMonsterPlacer> void registerSpawnEgg(Class<T> eggClass, String name, int primaryColor,
         int secondaryColor, String modid) {
         try {
@@ -46,5 +37,4 @@ public class MobUtil {
             throw new RuntimeException("Failed to register spawn egg for " + name, e);
         }
     }
-
 }

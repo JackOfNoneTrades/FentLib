@@ -3,6 +3,7 @@ package org.fentanylsolutions.fentlib.varinstances;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
+import net.minecraft.entity.EntityList;
 import net.minecraft.world.WorldProvider;
 
 import org.fentanylsolutions.fentlib.Config;
@@ -17,7 +18,7 @@ import org.fentanylsolutions.fentlib.util.XSTR;
 public class VarInstanceCommon {
 
     public XSTR rand = new XSTR();
-    public ArrayList<Class> passiveMobsWhichCanInflictDamage;
+    public ArrayList<Class<? extends net.minecraft.entity.Entity>> passiveMobsWhichCanInflictDamage;
     public Hashtable<Integer, Class<? extends WorldProvider>> providers;
 
     public void postInitHook() {
@@ -42,16 +43,11 @@ public class VarInstanceCommon {
     public void buildPassiveMobList() {
         passiveMobsWhichCanInflictDamage = new ArrayList<>();
         for (String s : Config.passiveMobsWhichCanInflictDamage) {
-            String class_ = MobUtil.getClassByName(s);
-            if (class_ == null) {
+            Class<? extends net.minecraft.entity.Entity> c = EntityList.stringToClassMapping.get(s);
+            if (c == null) {
                 FentLib.LOG.error("Failed to get mob class for name {}", s);
             } else {
-                try {
-                    Class c = Class.forName(class_);
-                    passiveMobsWhichCanInflictDamage.add(c);
-                } catch (ClassNotFoundException e) {
-                    FentLib.LOG.error("Failed to get class for classname {}", class_);
-                }
+                passiveMobsWhichCanInflictDamage.add(c);
             }
         }
     }
