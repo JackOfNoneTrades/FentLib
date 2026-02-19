@@ -51,6 +51,10 @@ public class CommonProxy {
 
 `./gradlew build`.
 
+## Dev Authlib Note
+
+`SessionAccessTokenOverrideMixin` allows overriding the session access token in dev launches via `-Dfentlib.accessTokenOverride=<token>`.
+
 ## Credits
 * [GT:NH buildscript](https://github.com/GTNewHorizons/ExampleMod1.7.10)
 

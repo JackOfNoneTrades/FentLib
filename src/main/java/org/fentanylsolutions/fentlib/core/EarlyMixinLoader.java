@@ -27,6 +27,7 @@ public class EarlyMixinLoader extends FentEarlyMixinLoader {
             .addMixin("AccessorS00PacketServerInfo", MiscUtil.Side.BOTH)
             .addMixin("AccessorNetHandlerStatusServer", MiscUtil.Side.BOTH)
             .addMixin("AccessorC00Handshake", MiscUtil.Side.BOTH)
+            .addMixin("SessionAccessTokenOverrideMixin", MiscUtil.Side.CLIENT)
 
             // Rest
             .addMixin("EntityLivingBaseMixin", MiscUtil.Side.BOTH)
