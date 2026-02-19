@@ -3,6 +3,15 @@ A shared code library and tweak/fix mod.
 
 ![logo](images/logo_small.png)
 
+[![hub](images/badges/github.png)](https://github.com/JackOfNoneTrades/FentLib/releases)
+[![maven](images/badges/maven.png)](https://maven.fentanylsolutions.org/#/releases/org/fentanylsolutions/fentlib/FentLib)
+![forge](images/badges/forge.png)
+
+<!--
+[![modrinth](images/badges/modrinth.png)](https://modrinth.com/mod/waystones-x)
+[![curse](images/badges/curse.png)](https://www.curseforge.com/minecraft/mc-mods/waystones-x)
+-->
+
 ## Features
 * Support for animated GIF server icons. Just drop a `server-icon.gif` file in the server root directory. Size limits are configurable. HodgePodge is a soft dependency, required if you want to use larger GIFs (because of the packet size limit).
 ![animated_server_icons](images/animated_server_icons.gif)
@@ -38,22 +47,14 @@ public class CommonProxy {
 * `/dump_thaumonomicon <Optional Comment>` command. Run it from the client, and all Thaumcraft research will be dumped as a static website. The comment will be visible under the page title, and you can indicate the pack or mods for with which the dump was done.
 ![Dump example](images/dumper_example.png)
 * `/warpdim` [dimension ID] command. Painlessly warp to a dimension (meant for debugging).
-
-## Downloads
-<!--* [CurseForge ![curse](images/icons/curse.png)](https://www.curseforge.com/minecraft/mc-mods/fentlib)
-* [Modrinth ![modrinth](images/icons/modrinth.png)](https://modrinth.com/mod/fentlib)-->
-* [Git ![git](images/icons/git.png)](https://github.com/JackOfNoneTrades/Fentlib/releases)
+* `SessionAccessTokenOverrideMixin` allows overriding the session access token in dev launches via `-Dfentlib.accessTokenOverride=<token>`.
 
 ## Dependencies
-* [UniMixins](https://modrinth.com/mod/unimixins) ([![curse](images/icons/curse.png)](https://www.curseforge.com/minecraft/mc-mods/unimixins), [![modrinth](images/icons/modrinth.png)](https://modrinth.com/mod/unimixins/versions), [![git](images/icons/git.png)](https://github.com/LegacyModdingMC/UniMixins/releases)) is a required dependency.
+* [UniMixins](https://modrinth.com/mod/unimixins) [![curse](images/icons/curse.png)](https://www.curseforge.com/minecraft/mc-mods/unimixins) [![modrinth](images/icons/modrinth.png)](https://modrinth.com/mod/unimixins/versions) [![git](images/icons/git.png)](https://github.com/LegacyModdingMC/UniMixins/releases)
 
 ## Building
 
 `./gradlew build`.
-
-## Dev Authlib Note
-
-`SessionAccessTokenOverrideMixin` allows overriding the session access token in dev launches via `-Dfentlib.accessTokenOverride=<token>`.
 
 ## Credits
 * [GT:NH buildscript](https://github.com/GTNewHorizons/ExampleMod1.7.10)
