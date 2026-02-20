@@ -108,6 +108,11 @@ public class Mixins extends FentMixins {
             .modid("modularui2")
             .phase(Phase.LATE)
             .build();
+        registry.mixin("MixinCatalogueModListScreenBackground")
+            .side(Side.CLIENT)
+            .modid("catalogue")
+            .phase(Phase.LATE)
+            .build();
     }
 
     public static java.util.List<String> getEarlyMixinsForLoader() {
