@@ -10,7 +10,6 @@ import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
 
 @IFMLLoadingPlugin.MCVersion("1.7.10")
 public abstract class FentEarlyMixinLoader implements IEarlyMixinLoader, IFMLLoadingPlugin {
-    // List<String> specialIds = Arrays.asList("fml", "mcp", "minecraft", "minecraftforge");
 
     @Override
     public String getMixinConfig() {
