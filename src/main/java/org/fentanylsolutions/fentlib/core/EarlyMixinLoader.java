@@ -18,7 +18,6 @@ public class EarlyMixinLoader extends FentEarlyMixinLoader {
 
     @Override
     public List<String> getMixins(Set<String> loadedCoreMods) {
-        new Mixins();
-        return Mixins.getEarlyMixins();
+        return Mixins.getEarlyMixinsForLoader();
     }
 }

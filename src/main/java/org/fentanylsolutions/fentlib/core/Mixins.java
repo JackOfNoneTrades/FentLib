@@ -1,86 +1,120 @@
 package org.fentanylsolutions.fentlib.core;
 
 import org.fentanylsolutions.fentlib.util.MiscUtil.Side;
-import org.fentanylsolutions.fentlib.util.MixinUtil.MixinBuilder;
+import org.fentanylsolutions.fentlib.util.MixinUtil;
 import org.fentanylsolutions.fentlib.util.MixinUtil.Phase;
 
 public class Mixins extends FentMixins {
 
-    static {
-        staticInit();
+    private static final Mixins INSTANCE = new Mixins();
 
+    @Override
+    protected void registerMixins(MixinUtil.Registry registry) {
         // Minecraft Accessors
-        new MixinBuilder("AccessorDimensionManager").modid("minecraftforge")
+        registry.mixin("AccessorDimensionManager")
+            .modid("minecraftforge")
             .phase(Phase.EARLY)
             .build();
-        new MixinBuilder("AccessorGuiScreen").side(Side.CLIENT)
+        registry.mixin("AccessorGuiScreen")
+            .side(Side.CLIENT)
             .phase(Phase.EARLY)
             .build();
-        new MixinBuilder("AccessorMinecraftServer").phase(Phase.EARLY)
+        registry.mixin("AccessorMinecraftServer")
+            .phase(Phase.EARLY)
             .build();
-        new MixinBuilder("AccessorS00PacketServerInfo").phase(Phase.EARLY)
+        registry.mixin("AccessorS00PacketServerInfo")
+            .phase(Phase.EARLY)
             .build();
-        new MixinBuilder("AccessorNetHandlerStatusServer").phase(Phase.EARLY)
+        registry.mixin("AccessorNetHandlerStatusServer")
+            .phase(Phase.EARLY)
             .build();
-        new MixinBuilder("AccessorC00Handshake").phase(Phase.EARLY)
+        registry.mixin("AccessorC00Handshake")
+            .phase(Phase.EARLY)
             .build();
-        new MixinBuilder("SessionAccessTokenOverrideMixin").phase(Phase.EARLY)
+        registry.mixin("SessionAccessTokenOverrideMixin")
+            .phase(Phase.EARLY)
             .side(Side.CLIENT)
             .build();
 
         // Minecraft Mixins
-        new MixinBuilder("EntityLivingBaseMixin").phase(Phase.EARLY)
-            .build();
-        new MixinBuilder("MixinJarDiscoverer").modid("fml")
+        registry.mixin("EntityLivingBaseMixin")
             .phase(Phase.EARLY)
             .build();
-        new MixinBuilder("FeatureAnimatedIcon$MixinMinecraftServer").side(Side.SERVER)
+        registry.mixin("MixinJarDiscoverer")
+            .modid("fml")
             .phase(Phase.EARLY)
             .build();
-        new MixinBuilder("FeatureAnimatedIcon$MixinServerData").side(Side.CLIENT)
+        registry.mixin("FeatureAnimatedIcon$MixinMinecraftServer")
+            .side(Side.SERVER)
             .phase(Phase.EARLY)
             .build();
-        new MixinBuilder("FeatureAnimatedIcon$MixinOldServerPinger").side(Side.CLIENT)
+        registry.mixin("FeatureAnimatedIcon$MixinServerData")
+            .side(Side.CLIENT)
             .phase(Phase.EARLY)
             .build();
-        new MixinBuilder("FeatureAnimatedIcon$MixinServerListEntryNormal").side(Side.CLIENT)
+        registry.mixin("FeatureAnimatedIcon$MixinOldServerPinger")
+            .side(Side.CLIENT)
             .phase(Phase.EARLY)
             .build();
-        new MixinBuilder("FeatureAnimatedIcon$MixinPacketBuffer").phase(Phase.EARLY)
+        registry.mixin("FeatureAnimatedIcon$MixinServerListEntryNormal")
+            .side(Side.CLIENT)
+            .phase(Phase.EARLY)
             .build();
-        new MixinBuilder("FeatureExtraPingData$NetHandlerStatusServerMixin").phase(Phase.EARLY)
+        registry.mixin("FeatureAnimatedIcon$MixinPacketBuffer")
+            .phase(Phase.EARLY)
             .build();
-        new MixinBuilder("FeatureExtraPingData$ServerStatusResponseSerializerMixin").phase(Phase.EARLY)
+        registry.mixin("FeatureExtraPingData$NetHandlerStatusServerMixin")
+            .phase(Phase.EARLY)
             .build();
-        new MixinBuilder("FeatureExtraPingData$MixinServerStatusResponse").phase(Phase.EARLY)
+        registry.mixin("FeatureExtraPingData$ServerStatusResponseSerializerMixin")
+            .phase(Phase.EARLY)
             .build();
-        new MixinBuilder("FeatureExtraPingData$MixinFMLClientHandler").phase(Phase.EARLY)
+        registry.mixin("FeatureExtraPingData$MixinServerStatusResponse")
+            .phase(Phase.EARLY)
             .build();
-        new MixinBuilder("FeatureExtraPingData$MixinOldServerPinger").phase(Phase.EARLY)
+        registry.mixin("FeatureExtraPingData$MixinFMLClientHandler")
+            .phase(Phase.EARLY)
             .build();
-        new MixinBuilder("FeatureExtraPingData$MixinNetHandlerHandshakeTCP").phase(Phase.EARLY)
+        registry.mixin("FeatureExtraPingData$MixinOldServerPinger")
+            .phase(Phase.EARLY)
             .build();
-        new MixinBuilder("FeatureExtraPingData$MixinNetworkManager").phase(Phase.EARLY)
+        registry.mixin("FeatureExtraPingData$MixinNetHandlerHandshakeTCP")
+            .phase(Phase.EARLY)
+            .build();
+        registry.mixin("FeatureExtraPingData$MixinNetworkManager")
+            .phase(Phase.EARLY)
             .build();
 
         // Other Accessors
-        new MixinBuilder("AccessorWidget").side(Side.CLIENT)
+        registry.mixin("AccessorWidget")
+            .side(Side.CLIENT)
             .modid("modularui2")
             .phase(Phase.LATE)
             .build();
 
         // Other mixins
-        new MixinBuilder("MixinGuiEnhancedModList").side(Side.CLIENT)
+        registry.mixin("MixinGuiEnhancedModList")
+            .side(Side.CLIENT)
             .modid("enderio")
             .phase(Phase.LATE)
             .build();
-        new MixinBuilder("MixinRemoveInfoButton").side(Side.CLIENT)
+        registry.mixin("MixinRemoveInfoButton")
+            .side(Side.CLIENT)
             .modid("fml")
             .phase(Phase.LATE)
             .build();
-        new MixinBuilder("MixinModularPanel").side(Side.CLIENT)
+        registry.mixin("MixinModularPanel")
+            .side(Side.CLIENT)
             .modid("modularui2")
             .phase(Phase.LATE)
             .build();
+    }
+
+    public static java.util.List<String> getEarlyMixinsForLoader() {
+        return INSTANCE.getEarlyMixins();
+    }
+
+    public static java.util.List<String> getLateMixinsForLoader(java.util.Set<String> loadedCoreMods) {
+        return INSTANCE.getLateMixins(loadedCoreMods);
     }
 }

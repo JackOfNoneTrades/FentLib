@@ -1,11 +1,12 @@
 package org.fentanylsolutions.fentlib.util;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class MixinUtil {
-
-    private static List<String> earlyMixins;
-    private static List<MixinBuilder> lateMixinBuilders;
 
     public enum Phase {
         NONE,
@@ -13,19 +14,43 @@ public class MixinUtil {
         LATE;
     }
 
-    public static void bindMixinLists(List<String> earlyMixinsLst, List<MixinBuilder> lateMixinBuildersLst) {
-        earlyMixins = earlyMixinsLst;
-        lateMixinBuilders = lateMixinBuildersLst;
+    public static class Registry {
+
+        private static final Set<String> SPECIAL_IDS = new HashSet<>(
+            Arrays.asList("fml", "mcp", "minecraft", "minecraftforge"));
+        private final List<String> earlyMixins = new ArrayList<>();
+        private final List<MixinBuilder> lateMixinBuilders = new ArrayList<>();
+
+        public MixinBuilder mixin(String name) {
+            return new MixinBuilder(this, name);
+        }
+
+        public List<String> resolveEarly() {
+            return new ArrayList<>(earlyMixins);
+        }
+
+        public List<String> resolveLate(Set<String> loadedCoreMods) {
+            List<String> res = new ArrayList<>();
+            for (MixinBuilder mb : lateMixinBuilders) {
+                if (!SPECIAL_IDS.contains(mb.modid) && !loadedCoreMods.contains(mb.modid)) {
+                    continue;
+                }
+                res.add(mb.modid + "." + mb.name);
+            }
+            return res;
+        }
     }
 
     public static class MixinBuilder {
 
+        private final Registry registry;
         public String name;
         public String modid = "minecraft";
         public MiscUtil.Side side = MiscUtil.Side.BOTH;
         public Phase phase = Phase.NONE;
 
-        public MixinBuilder(String name) {
+        public MixinBuilder(Registry registry, String name) {
+            this.registry = registry;
             this.name = name;
         }
 
@@ -53,9 +78,9 @@ public class MixinUtil {
                 return;
             }
             if (this.phase == Phase.EARLY) {
-                earlyMixins.add(this.modid + "." + this.name);
+                registry.earlyMixins.add(this.modid + "." + this.name);
             } else if (this.phase == Phase.LATE) {
-                lateMixinBuilders.add(this);
+                registry.lateMixinBuilders.add(this);
             }
         }
     }
