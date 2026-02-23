@@ -20,6 +20,7 @@ import cpw.mods.fml.common.event.FMLServerStartingEvent;
     version = Tags.VERSION,
     name = "FentLib",
     acceptedMinecraftVersions = "[1.7.10]",
+    acceptableRemoteVersions = "*",
     customProperties = { @Mod.CustomProperty(k = "license", v = "LGPLv3+SNEED"),
         @Mod.CustomProperty(k = "issueTrackerUrl", v = "https://github.com/JackOfNoneTrades/FentLib/issues"),
         @Mod.CustomProperty(k = "iconFile", v = "assets/fentlib/logo.png"),
