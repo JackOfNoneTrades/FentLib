@@ -40,10 +40,12 @@ public class Mixins extends FentMixins {
         registry.mixin("EntityLivingBaseMixin")
             .phase(Phase.EARLY)
             .build();
-        registry.mixin("MixinJarDiscoverer")
-            .modid("fml")
-            .phase(Phase.EARLY)
-            .build();
+        if (EarlyMixinConfig.enableJarDiscovererMixin()) {
+            registry.mixin("MixinJarDiscoverer")
+                .modid("fml")
+                .phase(Phase.EARLY)
+                .build();
+        }
         registry.mixin("FeatureAnimatedIcon$MixinMinecraftServer")
             .side(Side.SERVER)
             .phase(Phase.EARLY)
