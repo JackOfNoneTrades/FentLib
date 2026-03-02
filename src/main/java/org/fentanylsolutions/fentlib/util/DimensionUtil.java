@@ -49,10 +49,7 @@ public class DimensionUtil {
                 continue;
             }
             if (name.equals(worldProvider.getDimensionName())) {
-                return new SimpleDimensionObj(
-                    worldProvider.dimensionId,
-                    worldProvider.getDimensionName(),
-                    worldProvider.getDepartMessage());
+                return new SimpleDimensionObj(i, worldProvider.getDimensionName(), worldProvider.getDepartMessage());
             }
         }
         return null;
@@ -75,11 +72,8 @@ public class DimensionUtil {
             if (worldProvider == null) {
                 continue;
             }
-            if (worldProvider.dimensionId == id) {
-                return new SimpleDimensionObj(
-                    worldProvider.dimensionId,
-                    worldProvider.getDimensionName(),
-                    worldProvider.getDepartMessage());
+            if (i == id) {
+                return new SimpleDimensionObj(i, worldProvider.getDimensionName(), worldProvider.getDepartMessage());
             }
         }
         return null;
@@ -100,7 +94,7 @@ public class DimensionUtil {
             if (worldProvider == null) {
                 continue;
             }
-            FentLib.LOG.info("{} ({})", worldProvider.getDimensionName(), worldProvider.dimensionId);
+            FentLib.LOG.info("{} ({})", worldProvider.getDimensionName(), i);
         }
         FentLib.LOG.info("=============================");
     }
