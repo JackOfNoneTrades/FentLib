@@ -3,6 +3,7 @@ package org.fentanylsolutions.fentlib.util;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -32,7 +33,7 @@ public class MixinUtil {
         public List<String> resolveLate(Set<String> loadedCoreMods) {
             List<String> res = new ArrayList<>();
             for (MixinBuilder mb : lateMixinBuilders) {
-                if (!SPECIAL_IDS.contains(mb.modid) && !loadedCoreMods.contains(mb.modid)) {
+                if (!mb.matchesLoadedMod(loadedCoreMods, SPECIAL_IDS)) {
                     continue;
                 }
                 res.add(mb.modid + "." + mb.name);
@@ -46,6 +47,7 @@ public class MixinUtil {
         private final Registry registry;
         public String name;
         public String modid = "minecraft";
+        private final Set<String> extraModids = new LinkedHashSet<>();
         public MiscUtil.Side side = MiscUtil.Side.BOTH;
         public Phase phase = Phase.NONE;
 
@@ -56,6 +58,11 @@ public class MixinUtil {
 
         public MixinBuilder modid(String modid) {
             this.modid = modid;
+            return this;
+        }
+
+        public MixinBuilder extraModid(String modid) {
+            this.extraModids.add(modid);
             return this;
         }
 
@@ -82,6 +89,22 @@ public class MixinUtil {
             } else if (this.phase == Phase.LATE) {
                 registry.lateMixinBuilders.add(this);
             }
+        }
+
+        private boolean matchesLoadedMod(Set<String> loadedCoreMods, Set<String> specialIds) {
+            if (matchesLoadedModid(this.modid, loadedCoreMods, specialIds)) {
+                return true;
+            }
+            for (String extraModid : this.extraModids) {
+                if (matchesLoadedModid(extraModid, loadedCoreMods, specialIds)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private static boolean matchesLoadedModid(String modid, Set<String> loadedCoreMods, Set<String> specialIds) {
+            return specialIds.contains(modid) || loadedCoreMods.contains(modid);
         }
     }
 }
