@@ -33,20 +33,26 @@ public class ReverseProxyHttpHandler extends SimpleChannelInboundHandler<FullHtt
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest request) {
+        if (tryHandle(ctx, request)) {
+            return;
+        }
+        sendJson(
+            ctx,
+            HttpResponseStatus.NOT_FOUND,
+            "{\"error\":\"RouteNotFound\",\"errorMessage\":\"No HTTP port route matched this path\"}");
+    }
+
+    public static boolean tryHandle(ChannelHandlerContext ctx, FullHttpRequest request) {
         String uri = request.getUri();
         String path = new QueryStringDecoder(uri).path();
         HttpPortProxyConfig config = HttpPortProxyConfig.get();
         ResolvedRoute resolvedRoute = resolveRoute(config, request, path);
         if (resolvedRoute == null) {
-            sendJson(
-                ctx,
-                HttpResponseStatus.NOT_FOUND,
-                "{\"error\":\"RouteNotFound\",\"errorMessage\":\"No HTTP port route matched this path\"}");
-            return;
+            return false;
         }
         if (shouldRedirectToMountedDirectory(path, resolvedRoute)) {
             sendRedirect(ctx, addTrailingSlash(uri));
-            return;
+            return true;
         }
 
         try {
@@ -59,6 +65,7 @@ public class ReverseProxyHttpHandler extends SimpleChannelInboundHandler<FullHtt
                 HttpResponseStatus.BAD_GATEWAY,
                 "{\"error\":\"UpstreamUnavailable\",\"errorMessage\":\"Failed to contact mapped local service\"}");
         }
+        return true;
     }
 
     @Override
