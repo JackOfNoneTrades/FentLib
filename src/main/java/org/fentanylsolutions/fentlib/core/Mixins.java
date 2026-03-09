@@ -31,6 +31,10 @@ public class Mixins extends FentMixins {
         registry.mixin("AccessorC00Handshake")
             .phase(Phase.EARLY)
             .build();
+        registry.mixin("AccessorNetworkSystem")
+            .phase(Phase.EARLY)
+            .side(Side.SERVER)
+            .build();
         registry.mixin("SessionAccessTokenOverrideMixin")
             .phase(Phase.EARLY)
             .side(Side.CLIENT)
@@ -85,6 +89,10 @@ public class Mixins extends FentMixins {
             .build();
         registry.mixin("FeatureExtraPingData$MixinNetworkManager")
             .phase(Phase.EARLY)
+            .build();
+        registry.mixin("MixinNetworkSystemHttpProxy")
+            .phase(Phase.EARLY)
+            .side(Side.SERVER)
             .build();
 
         // Other Accessors
