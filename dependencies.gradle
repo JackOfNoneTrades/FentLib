@@ -45,6 +45,7 @@ dependencies {
 
     // Compilation + runtime
     devOnlyNonPublishable(rfg.deobf("curse.maven:catalogue-vintage-1465746:7695645")) // 1.0.2-1.7.10
+    devOnlyNonPublishable("com.github.GTNewHorizons:ServerUtilities:2.2.18:dev")
 
     // Pure compile
     compileOnly("com.github.GTNewHorizons:ModularUI2:2.3.45-1.7.10:dev")
