@@ -1,5 +1,6 @@
 package org.fentanylsolutions.fentlib.gui;
 
+import java.util.Arrays;
 import java.util.Set;
 
 import net.minecraft.client.Minecraft;
@@ -10,8 +11,6 @@ import net.minecraftforge.common.config.ConfigElement;
 
 import org.fentanylsolutions.fentlib.Config;
 import org.fentanylsolutions.fentlib.FentLib;
-
-import com.google.common.collect.ImmutableList;
 
 import cpw.mods.fml.client.IModGuiFactory;
 import cpw.mods.fml.client.config.GuiConfig;
@@ -42,7 +41,7 @@ public class GuiFactory implements IModGuiFactory {
         public ConfigGui(GuiScreen parentScreen) {
             super(
                 parentScreen,
-                ImmutableList.of(
+                Arrays.asList(
                     new ConfigElement(
                         Config.getRawConfig()
                             .getCategory(Config.Categories.general)),
