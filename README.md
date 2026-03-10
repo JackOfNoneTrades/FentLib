@@ -48,7 +48,7 @@ public class CommonProxy {
 ![Dump example](images/dumper_example.png)
 * `/warpdim` [dimension ID] command. Painlessly warp to a dimension (meant for debugging).
 * `SessionAccessTokenOverrideMixin` allows overriding the session access token in dev launches via `-Dfentlib.accessTokenOverride=<token>`.
-* HTTP-on-Minecraft-port reverse proxying for local web UIs. Configure path-to-port mappings in `fentlib/http-port-routes.json` so services like Dynmap can be reached through the server port as paths such as `/dynmap/...` instead of separate ports.
+* HTTP-on-Minecraft-port reverse proxying for local web UIs. Configure path-to-port mappings in `fentlib/http-port-routes.json` so services like Dynmap can be reached through the server port, such as `/dynmap/...`, instead of separate ports.
 
 ## Dependencies
 * [UniMixins](https://modrinth.com/mod/unimixins) [![curse](images/icons/curse.png)](https://www.curseforge.com/minecraft/mc-mods/unimixins) [![modrinth](images/icons/modrinth.png)](https://modrinth.com/mod/unimixins/versions) [![git](images/icons/git.png)](https://github.com/LegacyModdingMC/UniMixins/releases)
@@ -72,6 +72,3 @@ public class CommonProxy {
 <br>
 
 ![license](images/lgplsneed_small.png)
-
-TODO:
-* Still generate the vanilla server dat for multimc compat
