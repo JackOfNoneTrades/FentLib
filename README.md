@@ -66,7 +66,7 @@ public class CommonProxy {
 
 ## Buy me a coffee
 
-* [ko-fi.com](ko-fi.com/jackisasubtlejoke)
+* [ko-fi.com](https://ko-fi.com/jackisasubtlejoke)
 * Monero: `893tQ56jWt7czBsqAGPq8J5BDnYVCg2tvKpvwTcMY1LS79iDabopdxoUzNLEZtRTH4ewAcKLJ4DM4V41fvrJGHgeKArxwmJ`
 
 <br>
