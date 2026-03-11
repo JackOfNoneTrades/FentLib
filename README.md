@@ -4,12 +4,12 @@ A shared code library and tweak/fix mod.
 ![logo](images/logo_small.png)
 
 [![hub](images/badges/github.png)](https://github.com/JackOfNoneTrades/FentLib/releases)
+[![curse](images/badges/curse.png)](https://www.curseforge.com/minecraft/mc-mods/fentlib)
 [![maven](images/badges/maven.png)](https://maven.fentanylsolutions.org/#/releases/org/fentanylsolutions/fentlib/FentLib)
 ![forge](images/badges/forge.png)
 [![cord](images/badges/cord.png)](https://discord.gg/xAWCqGrguG)
 
 <!--[![modrinth](images/badges/modrinth.png)]()
-[![curse](images/badges/curse.png)]()
 [![mcmodcn](images/badges/mcmodcn.png)]()-->
 
 ## Features
@@ -49,6 +49,7 @@ public class CommonProxy {
 * `/warpdim` [dimension ID] command. Painlessly warp to a dimension (meant for debugging).
 * `SessionAccessTokenOverrideMixin` allows overriding the session access token in dev launches via `-Dfentlib.accessTokenOverride=<token>`.
 * HTTP-on-Minecraft-port reverse proxying for local web UIs. Configure path-to-port mappings in `fentlib/http-port-routes.json` so services like Dynmap can be reached through the server port, such as `/dynmap/...`, instead of separate ports.
+* Reorder Server entries in the Multiplayer menu while holding shift.
 
 ## Dependencies
 * [UniMixins](https://modrinth.com/mod/unimixins) [![curse](images/icons/curse.png)](https://www.curseforge.com/minecraft/mc-mods/unimixins) [![modrinth](images/icons/modrinth.png)](https://modrinth.com/mod/unimixins/versions) [![git](images/icons/git.png)](https://github.com/LegacyModdingMC/UniMixins/releases)
