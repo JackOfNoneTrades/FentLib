@@ -42,4 +42,22 @@ public class NetUtil {
         String port = portPart;
         return new String[] { ip, port };
     }
+
+    /**
+     * Normalizes an HTTP(S) URL: trims, prepends {@code https://} if no scheme
+     * is present, and strips trailing slashes.
+     *
+     * @return the normalized URL, or null for blank/null input
+     */
+    public static String normalizeHttpUrl(String raw) {
+        String value = StringUtil.trimToNull(raw);
+        if (value == null) return null;
+        if (!value.startsWith("http://") && !value.startsWith("https://")) {
+            value = "https://" + value;
+        }
+        while (value.endsWith("/")) {
+            value = value.substring(0, value.length() - 1);
+        }
+        return value.isEmpty() ? null : value;
+    }
 }
