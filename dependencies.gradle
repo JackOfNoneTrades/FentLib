@@ -37,19 +37,19 @@ dependencies {
     // https://nexus.gtnewhorizons.com/service/rest/repository/browse/public/
 
     // Pure runtime
-    runtimeOnlyNonPublishable("com.github.GTNewHorizons:Hodgepodge:2.7.96:dev")
-    runtimeOnlyNonPublishable("com.github.GTNewHorizons:NotEnoughItems:2.8.74-GTNH:dev")
+    runtimeOnlyNonPublishable("com.github.GTNewHorizons:Hodgepodge:2.7.110:dev")
+    runtimeOnlyNonPublishable("com.github.GTNewHorizons:NotEnoughItems:2.8.81-GTNH:dev")
     runtimeOnlyNonPublishable("curse.maven:archaicfix-677782:6785842")
-    runtimeOnlyNonPublishable("com.github.GTNewHorizons:Angelica:2.1.2:dev")
-    runtimeOnlyNonPublishable("com.github.GTNewHorizons:GTNHLib:0.9.37:dev")
+    runtimeOnlyNonPublishable("com.github.GTNewHorizons:Angelica:2.1.7:dev")
+    runtimeOnlyNonPublishable("com.github.GTNewHorizons:GTNHLib:0.9.45:dev")
     runtimeOnlyNonPublishable("com.github.GTNewHorizons:GTNH-Web-Map:0.3.46:dev")
 
     // Compilation + runtime
     devOnlyNonPublishable(rfg.deobf("curse.maven:catalogue-vintage-1465746:7695645")) // 1.0.2-1.7.10
-    devOnlyNonPublishable("com.github.GTNewHorizons:ServerUtilities:2.2.18:dev")
+    devOnlyNonPublishable("com.github.GTNewHorizons:ServerUtilities:2.2.19:dev")
 
     // Pure compile
-    compileOnly("com.github.GTNewHorizons:ModularUI2:2.3.45-1.7.10:dev")
+    compileOnly("com.github.GTNewHorizons:ModularUI2:2.3.48-1.7.10:dev")
     compileOnly("org.jetbrains:annotations:26.1.0")
     compileOnly(rfg.deobf("curse.maven:endercore-231868:4671288")) // Hodgepodge already ports the mod menu, but FentLib still allows to modify both
     compileOnly(rfg.deobf("curse.maven:thaumcraft-223628:2227552")) {transitive=false}
