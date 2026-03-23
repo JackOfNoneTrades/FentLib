@@ -1,1 +1,15 @@
 fentlib.configgui.title=Fentlib Config
+
+fentlib.gui.common.failed_message=Failed: %s
+fentlib.gui.file_picker.interrupted=File picker interrupted.
+fentlib.gui.file_picker.macos_failed=macOS picker failed.
+fentlib.gui.file_picker.no_file=File picker returned no file.
+fentlib.gui.file_picker.not_a_file=Selected path is not a file.
+fentlib.gui.file_picker.not_macos=Not macOS.
+fentlib.gui.file_picker.not_readable=Selected file is not readable.
+fentlib.gui.file_picker.osascript_missing=osascript unavailable.
+fentlib.gui.file_picker.select_file=Select File
+fentlib.gui.file_picker.tinyfd_missing=LWJGL tinyfd not present.
+fentlib.gui.file_picker.unavailable=Native file picker is not available on this runtime.
+fentlib.gui.file_picker.unknown_error=Unknown picker error.
+fentlib.gui.file_picker.unsupported_type=Only %s files are supported.
