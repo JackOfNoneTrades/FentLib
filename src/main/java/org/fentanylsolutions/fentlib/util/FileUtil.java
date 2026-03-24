@@ -1,6 +1,7 @@
 package org.fentanylsolutions.fentlib.util;
 
-import java.awt.*;
+import java.awt.FileDialog;
+import java.awt.Frame;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
