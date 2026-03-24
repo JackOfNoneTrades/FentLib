@@ -1,6 +1,7 @@
 package org.fentanylsolutions.fentlib.util;
 
-import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -13,13 +14,36 @@ import javax.imageio.ImageIO;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 
 import org.fentanylsolutions.fentlib.Config;
+import org.fentanylsolutions.fentlib.FentLib;
 
-import com.sksamuel.scrimage.ImmutableImage;
 import com.sksamuel.scrimage.nio.AnimatedGif;
 import com.sksamuel.scrimage.nio.AnimatedGifReader;
 import com.sksamuel.scrimage.nio.ImageSource;
 
 public class GifUtil {
+
+    public static class GifData {
+
+        private final BufferedImage[] frames;
+        private final int[] delaysMs;
+
+        public GifData(BufferedImage[] frames, int[] delaysMs) {
+            this.frames = frames;
+            this.delaysMs = delaysMs;
+        }
+
+        public int getFrameCount() {
+            return frames.length;
+        }
+
+        public BufferedImage getFrame(int index) {
+            return frames[index];
+        }
+
+        public int getDelayMs(int index) {
+            return delaysMs[index];
+        }
+    }
 
     public static class GifAnimationData {
 
@@ -56,37 +80,95 @@ public class GifUtil {
         }
     }
 
-    public static AnimatedGif bytesToGif(byte[] gifBytes) throws IOException {
-        AnimatedGif res = AnimatedGifReader.read(ImageSource.of(new ByteArrayInputStream(gifBytes)));
+    /**
+     * Reads an animated GIF into a GifData using the configured backend.
+     */
+    public static GifData readGif(byte[] gifBytes) throws IOException {
+        if (Config.useNativeGifReader) {
+            FentLib.debug("Reading GIF with native reader");
+            return NativeGifReader.read(gifBytes);
+        }
+        FentLib.debug("Reading GIF with scrimage reader");
+        return readGifWithScrimage(gifBytes);
+    }
 
-        int frameCount = res.getFrameCount();
+    private static GifData readGifWithScrimage(byte[] gifBytes) throws IOException {
+        AnimatedGif gif = AnimatedGifReader.read(ImageSource.of(new ByteArrayInputStream(gifBytes)));
+        int frameCount = gif.getFrameCount();
         if (frameCount == 0) {
             throw new IOException("No frames found in GIF");
         }
-        return res;
+
+        BufferedImage[] frames = new BufferedImage[frameCount];
+        int[] delays = new int[frameCount];
+        for (int i = 0; i < frameCount; i++) {
+            frames[i] = gif.getFrame(i)
+                .awt();
+            delays[i] = (int) gif.getDelay(i)
+                .toMillis();
+        }
+        return new GifData(frames, delays);
     }
 
-    public static BufferedImage stitchGif(AnimatedGif gif, int frameW, int frameH) throws IOException {
+    /**
+     * Scales a frame to the target dimensions using progressive bilinear downscaling.
+     * Repeatedly halves each dimension until close to the target, then does one final
+     * bicubic step. This avoids the quality loss of a single large bilinear step.
+     */
+    public static BufferedImage scaleFrame(BufferedImage src, int targetW, int targetH) {
+        if (src.getWidth() == targetW && src.getHeight() == targetH) {
+            return src;
+        }
+
+        BufferedImage current = src;
+        int w = current.getWidth();
+        int h = current.getHeight();
+
+        // Progressive halving for downscaling
+        while (w > targetW * 2 || h > targetH * 2) {
+            int nextW = Math.max(w / 2, targetW);
+            int nextH = Math.max(h / 2, targetH);
+            BufferedImage step = new BufferedImage(nextW, nextH, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g = step.createGraphics();
+            g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+            g.drawImage(current, 0, 0, nextW, nextH, null);
+            g.dispose();
+            current = step;
+            w = nextW;
+            h = nextH;
+        }
+
+        // Final step with bicubic
+        BufferedImage result = new BufferedImage(targetW, targetH, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = result.createGraphics();
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+        g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        g.drawImage(current, 0, 0, targetW, targetH, null);
+        g.dispose();
+        return result;
+    }
+
+    /**
+     * Stitches GIF frames into a horizontal sprite sheet.
+     */
+    public static BufferedImage stitchGif(GifData gif, int frameW, int frameH) {
         int frameCount = gif.getFrameCount();
-        // Use average delay (or first frame delay)
-        int frameDelayMs = (int) gif.getDelay(0)
-            .toMillis();
-        if (frameDelayMs == 0) {
-            frameDelayMs = 1000;
-        }
-
-        // Create empty image to hold stitched frames horizontally
-        ImmutableImage spriteSheet = ImmutableImage.filled(frameW * frameCount, frameH, new Color(0, 0, 0, 0));
-
-        // Place each resized frame into the stitched image
+        BufferedImage spriteSheet = new BufferedImage(frameW * frameCount, frameH, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = spriteSheet.createGraphics();
         for (int i = 0; i < frameCount; i++) {
-            ImmutableImage frame = gif.getFrame(i)
-                .scaleTo(frameW, frameH);
-            spriteSheet = spriteSheet.overlay(frame, i * frameW, 0);
+            BufferedImage frame = scaleFrame(gif.getFrame(i), frameW, frameH);
+            g.drawImage(frame, i * frameW, 0, null);
         }
+        g.dispose();
+        return spriteSheet;
+    }
 
-        // Convert to BufferedImage
-        return spriteSheet.awt();
+    /**
+     * Returns the first frame's delay in ms, defaulting to 1000 if zero.
+     */
+    public static int getFrameDelay(GifData gif) {
+        int delay = gif.getDelayMs(0);
+        return delay > 0 ? delay : 1000;
     }
 
     /**
@@ -94,23 +176,12 @@ public class GifUtil {
      * stitches them into a single horizontal strip, and returns
      * a DynamicTexture along with animation info.
      */
-    // TODO: maybe return null if something goes wrong
     public static GifAnimationData loadGifFromBytes(byte[] gifBytes, int frameW, int frameH) throws IOException {
-        AnimatedGif gif = bytesToGif(gifBytes);
-        int frameCount = gif.getFrameCount();
-        // Use average delay (or first frame delay)
-        int frameDelayMs = (int) gif.getDelay(0)
-            .toMillis();
-        if (frameDelayMs == 0) {
-            frameDelayMs = 1000;
-        }
-
+        GifData gif = readGif(gifBytes);
+        int frameDelayMs = getFrameDelay(gif);
         BufferedImage stitchedImage = stitchGif(gif, frameW, frameH);
-
-        // Create Minecraft-compatible dynamic texture
         DynamicTexture tex = new DynamicTexture(stitchedImage);
-
-        return new GifAnimationData(tex, frameW, frameH, frameCount, frameDelayMs);
+        return new GifAnimationData(tex, frameW, frameH, gif.getFrameCount(), frameDelayMs);
     }
 
     public static byte[] bufferedImageToByteArray(BufferedImage img) {
@@ -144,31 +215,20 @@ public class GifUtil {
     }
 
     public static StitchedAnimationData stitchedFromBytes(byte[] gifBytes, int frameW, int frameH) {
-        AnimatedGif gif = null;
+        GifData gif;
         try {
-            gif = bytesToGif(gifBytes);
+            gif = readGif(gifBytes);
         } catch (IOException e) {
             return null;
         }
-        int frameCount = gif.getFrameCount();
-        // Use average delay (or first frame delay)
-        int frameDelayMs = (int) gif.getDelay(0)
-            .toMillis();
-        if (frameDelayMs == 0) {
-            frameDelayMs = 1000;
-        }
+        int frameDelayMs = getFrameDelay(gif);
 
-        BufferedImage stitchedImage = null;
-        try {
-            stitchedImage = stitchGif(gif, frameW, frameH);
-        } catch (IOException e) {
-            return null;
-        }
+        BufferedImage stitchedImage = stitchGif(gif, frameW, frameH);
         byte[] imgBytes = bufferedImageToByteArray(stitchedImage);
         if (imgBytes == null) {
             return null;
         }
-        return new StitchedAnimationData(imgBytes, frameW, frameH, frameCount, frameDelayMs);
+        return new StitchedAnimationData(imgBytes, frameW, frameH, gif.getFrameCount(), frameDelayMs);
     }
 
     public static void validateStitchedData(StitchedAnimationData data) throws IOException {
@@ -203,13 +263,11 @@ public class GifUtil {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         DataOutputStream dos = new DataOutputStream(out);
 
-        // Write metadata
         dos.writeInt(data.frameWidth);
         dos.writeInt(data.frameHeight);
         dos.writeInt(data.frameCount);
         dos.writeInt(data.frameDelayMs);
 
-        // Write image length + data
         dos.writeInt(data.stichedData.length);
         dos.write(data.stichedData);
 
@@ -233,5 +291,4 @@ public class GifUtil {
         validateStitchedData(res);
         return res;
     }
-
 }

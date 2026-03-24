@@ -25,7 +25,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.cleanroommc.catalogue.client.IModData;
 import com.cleanroommc.catalogue.client.screen.CatalogueModListScreen;
-import com.sksamuel.scrimage.nio.AnimatedGif;
 
 @Mixin(CatalogueModListScreen.class)
 public abstract class MixinCatalogueModListScreenBackground {
@@ -198,15 +197,11 @@ public abstract class MixinCatalogueModListScreenBackground {
 
     @Unique
     private static BackgroundAnimationData fentlib$buildPagedBackgroundData(byte[] gifBytes) throws IOException {
-        AnimatedGif gif = GifUtil.bytesToGif(gifBytes);
+        GifUtil.GifData gif = GifUtil.readGif(gifBytes);
         int frameWidth = fentlib$atlasFrameWidth;
         int frameHeight = fentlib$atlasFrameHeight;
         int frameCount = gif.getFrameCount();
-        int frameDelayMs = (int) gif.getDelay(0)
-            .toMillis();
-        if (frameDelayMs <= 0) {
-            frameDelayMs = 1000;
-        }
+        int frameDelayMs = GifUtil.getFrameDelay(gif);
 
         int framesPerPage = Math.max(1, fentlib$atlasMaxWidth / frameWidth);
         int pageCount = (frameCount + framesPerPage - 1) / framesPerPage;
@@ -225,9 +220,7 @@ public abstract class MixinCatalogueModListScreenBackground {
             try {
                 for (int i = 0; i < pageFrames; i++) {
                     int srcFrame = pageStartFrame + i;
-                    BufferedImage frame = gif.getFrame(srcFrame)
-                        .scaleTo(frameWidth, frameHeight)
-                        .awt();
+                    BufferedImage frame = GifUtil.scaleFrame(gif.getFrame(srcFrame), frameWidth, frameHeight);
                     g.drawImage(frame, i * frameWidth, 0, null);
                 }
             } finally {
