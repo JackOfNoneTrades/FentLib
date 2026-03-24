@@ -2,6 +2,7 @@ package org.fentanylsolutions.fentlib.varinstances;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Base64;
 
@@ -13,6 +14,7 @@ import org.apache.commons.lang3.Validate;
 import org.fentanylsolutions.fentlib.FentLib;
 import org.fentanylsolutions.fentlib.util.GifUtil;
 import org.fentanylsolutions.fentlib.util.QoiUtil;
+import org.fentanylsolutions.fentlib.util.WebpUtil;
 
 import com.google.common.base.Charsets;
 
@@ -30,10 +32,14 @@ public class VarInstanceServer {
             .getFile("server-icon.png");
         File qoiFile = MinecraftServer.getServer()
             .getFile("server-icon.qoi");
+        File webpFile = MinecraftServer.getServer()
+            .getFile("server-icon.webp");
         if (pngFile.isFile()) {
-            loadStaticFavicon(pngFile, false);
+            loadStaticFavicon(pngFile);
         } else if (qoiFile.isFile()) {
-            loadStaticFavicon(qoiFile, true);
+            loadStaticFavicon(qoiFile);
+        } else if (webpFile.isFile()) {
+            loadStaticFavicon(webpFile);
         } else {
             FentLib.LOG.info("Static server icon not found");
             staticFaviconBlob = null;
@@ -67,15 +73,10 @@ public class VarInstanceServer {
         }
     }
 
-    private void loadStaticFavicon(File file, boolean isQoi) {
+    private void loadStaticFavicon(File file) {
         ByteBuf bytebuf = Unpooled.buffer();
         try {
-            BufferedImage bufferedimage;
-            if (isQoi) {
-                bufferedimage = QoiUtil.readImage(file);
-            } else {
-                bufferedimage = ImageIO.read(file);
-            }
+            BufferedImage bufferedimage = readStaticIcon(file);
             Validate.validState(bufferedimage.getWidth() == 64, "Must be 64 pixels wide");
             Validate.validState(bufferedimage.getHeight() == 64, "Must be 64 pixels high");
             ImageIO.write(bufferedimage, "PNG", new ByteBufOutputStream(bytebuf));
@@ -87,5 +88,17 @@ public class VarInstanceServer {
         } finally {
             bytebuf.release();
         }
+    }
+
+    private static BufferedImage readStaticIcon(File file) throws IOException {
+        String name = file.getName()
+            .toLowerCase();
+        if (name.endsWith(".qoi")) {
+            return QoiUtil.readImage(file);
+        }
+        if (name.endsWith(".webp")) {
+            return WebpUtil.readImage(file);
+        }
+        return ImageIO.read(file);
     }
 }

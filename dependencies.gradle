@@ -57,6 +57,7 @@ dependencies {
     // Shadow
     shadowCompile("com.sksamuel.scrimage:scrimage-core:4.4.0-fent")
     shadowCompile("me.saharnooby:qoi-java:1.2.1")
+    shadowCompile("com.twelvemonkeys.imageio:imageio-webp:3.13.1")
 
     // Disabled
     // api("club.heiqi:qz_fontrender:1.4.3:dev")
