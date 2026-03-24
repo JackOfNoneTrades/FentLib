@@ -8,14 +8,12 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import net.minecraft.client.renderer.texture.DynamicTexture;
-import net.minecraft.util.ResourceLocation;
-
 import me.saharnooby.qoi.QOIImage;
 import me.saharnooby.qoi.QOIUtil;
 
 /**
- * Minecraft-friendly wrappers around QOI image encoding/decoding.
+ * QOI image encoding/decoding. Safe for both client and server.
+ * For client-only helpers (DynamicTexture, ResourceLocation), see {@link QoiClientUtil}.
  */
 public final class QoiUtil {
 
@@ -39,15 +37,6 @@ public final class QoiUtil {
         }
     }
 
-    public static BufferedImage readImage(ResourceLocation location) throws IOException {
-        try (InputStream in = net.minecraft.client.Minecraft.getMinecraft()
-            .getResourceManager()
-            .getResource(location)
-            .getInputStream()) {
-            return readImage(in);
-        }
-    }
-
     // --- Encoding ---
 
     public static byte[] encode(BufferedImage image) throws IOException {
@@ -60,20 +49,6 @@ public final class QoiUtil {
     public static void writeImage(BufferedImage image, File file) throws IOException {
         QOIImage qoi = fromBufferedImage(image);
         QOIUtil.writeImage(qoi, file);
-    }
-
-    // --- Minecraft texture helpers ---
-
-    public static DynamicTexture readDynamicTexture(byte[] qoiBytes) throws IOException {
-        return new DynamicTexture(readImage(qoiBytes));
-    }
-
-    public static DynamicTexture readDynamicTexture(InputStream in) throws IOException {
-        return new DynamicTexture(readImage(in));
-    }
-
-    public static DynamicTexture readDynamicTexture(ResourceLocation location) throws IOException {
-        return new DynamicTexture(readImage(location));
     }
 
     // --- Conversion ---

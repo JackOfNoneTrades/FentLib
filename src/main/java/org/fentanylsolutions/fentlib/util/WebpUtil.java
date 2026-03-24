@@ -12,14 +12,11 @@ import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 
-import net.minecraft.client.renderer.texture.DynamicTexture;
-import net.minecraft.util.ResourceLocation;
-
 import com.twelvemonkeys.imageio.plugins.webp.WebPImageReaderSpi;
 
 /**
- * Minecraft-friendly wrappers around WebP image decoding.
- * Uses TwelveMonkeys ImageIO WebP plugin directly (no SPI discovery needed).
+ * WebP image decoding. Safe for both client and server.
+ * For client-only helpers (DynamicTexture, ResourceLocation), see {@link WebpClientUtil}.
  */
 public final class WebpUtil {
 
@@ -55,29 +52,6 @@ public final class WebpUtil {
         try (FileInputStream fis = new FileInputStream(file)) {
             return readImage(fis);
         }
-    }
-
-    public static BufferedImage readImage(ResourceLocation location) throws IOException {
-        try (InputStream in = net.minecraft.client.Minecraft.getMinecraft()
-            .getResourceManager()
-            .getResource(location)
-            .getInputStream()) {
-            return readImage(in);
-        }
-    }
-
-    // --- Minecraft texture helpers ---
-
-    public static DynamicTexture readDynamicTexture(byte[] webpBytes) throws IOException {
-        return new DynamicTexture(readImage(webpBytes));
-    }
-
-    public static DynamicTexture readDynamicTexture(InputStream in) throws IOException {
-        return new DynamicTexture(readImage(in));
-    }
-
-    public static DynamicTexture readDynamicTexture(ResourceLocation location) throws IOException {
-        return new DynamicTexture(readImage(location));
     }
 
     // --- Re-encoding (WebP -> PNG bytes, since TwelveMonkeys WebP is read-only) ---
