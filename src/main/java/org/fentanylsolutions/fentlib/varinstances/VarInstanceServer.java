@@ -12,6 +12,7 @@ import net.minecraft.server.MinecraftServer;
 import org.apache.commons.lang3.Validate;
 import org.fentanylsolutions.fentlib.FentLib;
 import org.fentanylsolutions.fentlib.util.GifUtil;
+import org.fentanylsolutions.fentlib.util.QoiUtil;
 
 import com.google.common.base.Charsets;
 
@@ -25,23 +26,14 @@ public class VarInstanceServer {
     public String animatedFaviconBlob = null;
 
     public void loadFavicons() {
-        File file1 = MinecraftServer.getServer()
+        File pngFile = MinecraftServer.getServer()
             .getFile("server-icon.png");
-        if (file1.isFile()) {
-            ByteBuf bytebuf = Unpooled.buffer();
-            try {
-                BufferedImage bufferedimage = ImageIO.read(file1);
-                Validate.validState(bufferedimage.getWidth() == 64, "Must be 64 pixels wide");
-                Validate.validState(bufferedimage.getHeight() == 64, "Must be 64 pixels high");
-                ImageIO.write(bufferedimage, "PNG", new ByteBufOutputStream(bytebuf));
-                ByteBuf bytebuf1 = io.netty.handler.codec.base64.Base64.encode(bytebuf);
-                staticFaviconBlob = "data:image/png;base64," + bytebuf1.toString(Charsets.UTF_8);
-            } catch (Exception exception) {
-                FentLib.LOG.error("Couldn\'t load static server favicon", exception);
-            } finally {
-                bytebuf.release();
-                FentLib.LOG.info("Successfully loaded static server icon");
-            }
+        File qoiFile = MinecraftServer.getServer()
+            .getFile("server-icon.qoi");
+        if (pngFile.isFile()) {
+            loadStaticFavicon(pngFile, false);
+        } else if (qoiFile.isFile()) {
+            loadStaticFavicon(qoiFile, true);
         } else {
             FentLib.LOG.info("Static server icon not found");
             staticFaviconBlob = null;
@@ -72,6 +64,28 @@ public class VarInstanceServer {
         } else {
             FentLib.LOG.info("Animated server icon not found");
             animatedFaviconBlob = null;
+        }
+    }
+
+    private void loadStaticFavicon(File file, boolean isQoi) {
+        ByteBuf bytebuf = Unpooled.buffer();
+        try {
+            BufferedImage bufferedimage;
+            if (isQoi) {
+                bufferedimage = QoiUtil.readImage(file);
+            } else {
+                bufferedimage = ImageIO.read(file);
+            }
+            Validate.validState(bufferedimage.getWidth() == 64, "Must be 64 pixels wide");
+            Validate.validState(bufferedimage.getHeight() == 64, "Must be 64 pixels high");
+            ImageIO.write(bufferedimage, "PNG", new ByteBufOutputStream(bytebuf));
+            ByteBuf bytebuf1 = io.netty.handler.codec.base64.Base64.encode(bytebuf);
+            staticFaviconBlob = "data:image/png;base64," + bytebuf1.toString(Charsets.UTF_8);
+            FentLib.LOG.info("Successfully loaded static server icon from {}", file.getName());
+        } catch (Exception exception) {
+            FentLib.LOG.error("Couldn't load static server favicon from " + file.getName(), exception);
+        } finally {
+            bytebuf.release();
         }
     }
 }
