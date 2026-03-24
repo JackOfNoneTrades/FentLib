@@ -30,6 +30,10 @@ gradle.allprojects {
     buildscript.repositories.keepFentMavenFirst()
 }
 
+tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>().configureEach {
+    exclude("META-INF/services/javax.imageio.spi.*")
+}
+
 tasks.withType<JavaExec>().configureEach {
     if (name.startsWith("runServer")) {
         // WawelAuth GUI stack is client-only. Strip these from dedicated-server
