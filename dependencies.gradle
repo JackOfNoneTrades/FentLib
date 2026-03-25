@@ -51,6 +51,8 @@ dependencies {
     // Pure compile
     compileOnly("com.github.GTNewHorizons:ModularUI2:2.3.48-1.7.10:dev")
     compileOnly("org.jetbrains:annotations:26.1.0")
+    compileOnly("com.github.GTNewHorizons:lwjgl3ify:3.0.15:dev")
+    compileOnly("org.lwjgl:lwjgl-sdl:3.4.1")
     compileOnly(rfg.deobf("curse.maven:endercore-231868:4671288")) // Hodgepodge already ports the mod menu, but FentLib still allows to modify both
     compileOnly(rfg.deobf("curse.maven:thaumcraft-223628:2227552")) {transitive=false}
 
