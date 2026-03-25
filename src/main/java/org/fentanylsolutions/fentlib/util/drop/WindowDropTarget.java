@@ -177,12 +177,13 @@ public final class WindowDropTarget {
      * @return float array {guiX, guiY}
      */
     public static float[] sdlToGuiCoords(float sx, float sy) {
+        float pixelScale = org.lwjglx.opengl.Display.getPixelScaleFactor();
         Minecraft mc = Minecraft.getMinecraft();
-        float scaleX = (float) mc.displayWidth / Math.max(1, org.lwjglx.opengl.Display.getWidth());
-        float scaleY = (float) mc.displayHeight / Math.max(1, org.lwjglx.opengl.Display.getHeight());
         ScaledResolution sr = new ScaledResolution(mc, mc.displayWidth, mc.displayHeight);
-        float guiX = (sx * scaleX) / sr.getScaleFactor();
-        float guiY = (sy * scaleY) / sr.getScaleFactor();
+        float fbX = sx * pixelScale;
+        float fbY = sy * pixelScale;
+        float guiX = fbX / sr.getScaleFactor();
+        float guiY = fbY / sr.getScaleFactor();
         return new float[] { guiX, guiY };
     }
 
