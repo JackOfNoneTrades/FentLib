@@ -30,6 +30,8 @@ public class Config {
 
     public static boolean disableEnderCoreInfoButton = true;
 
+    public static String publicBaseUrl = "";
+
     public static void loadConfig(File configFile) {
         config = new Configuration(configFile);
 
@@ -96,6 +98,13 @@ public class Config {
                 Categories.general,
                 useNativeGifReader,
                 "Use the pure Java GIF reader instead of scrimage. Disable this to fall back to the scrimage-based reader.");
+
+            // HTTP
+            publicBaseUrl = config.getString(
+                "publicBaseUrl",
+                Categories.general,
+                publicBaseUrl,
+                "Public base URL of this server (e.g. http://myserver.example.com:25565). Used by mods to construct externally reachable URLs for HTTP routes.");
 
             // Misc tweaks
             disableEnderCoreInfoButton = config.getBoolean(
