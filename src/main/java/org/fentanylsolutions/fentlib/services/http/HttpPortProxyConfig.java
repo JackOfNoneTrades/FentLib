@@ -8,6 +8,8 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import net.minecraft.launchwrapper.Launch;
 
@@ -24,6 +26,8 @@ public final class HttpPortProxyConfig {
     private static final String CONFIG_FILE_NAME = "http-port-routes.json";
     private static volatile HttpPortProxyConfig cachedConfig;
     private static volatile long cachedLastModified = Long.MIN_VALUE;
+
+    private static final Map<String, Route> apiRoutes = new ConcurrentHashMap<>();
 
     public List<Route> routes = new ArrayList<>();
 
@@ -96,12 +100,63 @@ public final class HttpPortProxyConfig {
         if (slash >= 0) {
             firstSegment = normalizedPath.substring(0, slash);
         }
+        Route apiRoute = apiRoutes.get(firstSegment);
+        if (apiRoute != null) {
+            return apiRoute;
+        }
         for (Route route : routes) {
             if (route.path.equals(firstSegment)) {
                 return route;
             }
         }
         return null;
+    }
+
+    /**
+     * Register a route at runtime from another mod. Takes priority over file-based routes.
+     *
+     * @param path       first path segment to match (e.g. "emojis")
+     * @param targetPort local port to proxy to
+     */
+    public static void registerRoute(String path, int targetPort) {
+        registerRoute(path, targetPort, "/");
+    }
+
+    /**
+     * Register a route at runtime from another mod. Takes priority over file-based routes.
+     *
+     * @param path             first path segment to match (e.g. "emojis")
+     * @param targetPort       local port to proxy to
+     * @param targetPathPrefix path prefix on the target (default "/")
+     */
+    public static void registerRoute(String path, int targetPort, String targetPathPrefix) {
+        Route route = new Route();
+        route.path = path;
+        route.targetPort = targetPort;
+        route.targetPathPrefix = targetPathPrefix;
+        Route sanitized = new Route();
+        sanitized.path = route.normalizedPath();
+        sanitized.targetPort = route.targetPort;
+        sanitized.targetPathPrefix = route.normalizedTargetPathPrefix();
+        if (!sanitized.isValid()) {
+            FentLib.LOG.warn("Invalid API route: path='{}', port={}", path, targetPort);
+            return;
+        }
+        apiRoutes.put(sanitized.path, sanitized);
+        FentLib.LOG.info("Registered API HTTP route '{}' -> localhost:{}", sanitized.path, targetPort);
+    }
+
+    /**
+     * Unregister a previously registered API route.
+     *
+     * @param path the path segment to remove
+     */
+    public static void unregisterRoute(String path) {
+        String normalized = normalizeRequestPath(path);
+        Route removed = apiRoutes.remove(normalized);
+        if (removed != null) {
+            FentLib.LOG.info("Unregistered API HTTP route '{}'", normalized);
+        }
     }
 
     public Route matchReferer(String referer) {
