@@ -53,7 +53,7 @@ public final class WebpUtil {
             ImageReader reader = SPI.createReaderInstance();
             reader.setInput(iis);
             try {
-                return reader.read(0);
+                return ImageUtil.copyToArgb(reader.read(0));
             } finally {
                 reader.dispose();
             }
@@ -96,7 +96,7 @@ public final class WebpUtil {
 
                 // If not animated (no ANMF chunks), return single frame
                 if (anmfFrames == null || anmfFrames.isEmpty()) {
-                    BufferedImage[] frames = new BufferedImage[] { reader.read(0) };
+                    BufferedImage[] frames = new BufferedImage[] { ImageUtil.copyToArgb(reader.read(0)) };
                     return new GifUtil.GifData(frames, new int[] { 100 });
                 }
 
@@ -108,7 +108,7 @@ public final class WebpUtil {
                 int[] delays = new int[frameCount];
 
                 for (int i = 0; i < frameCount; i++) {
-                    BufferedImage rawFrame = reader.read(i);
+                    BufferedImage rawFrame = ImageUtil.copyToArgb(reader.read(i));
                     AnmfMeta meta = i < anmfFrames.size() ? anmfFrames.get(i) : AnmfMeta.DEFAULT;
 
                     // Save canvas before drawing if we might need to restore
@@ -264,11 +264,7 @@ public final class WebpUtil {
     }
 
     private static BufferedImage copyImage(BufferedImage src) {
-        BufferedImage copy = new BufferedImage(src.getWidth(), src.getHeight(), BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g = copy.createGraphics();
-        g.drawImage(src, 0, 0, null);
-        g.dispose();
-        return copy;
+        return ImageUtil.copyToNewArgb(src);
     }
 
     private static byte[] readAllBytes(InputStream in) throws IOException {

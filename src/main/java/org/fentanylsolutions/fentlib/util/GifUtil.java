@@ -208,7 +208,8 @@ public class GifUtil {
     public static BufferedImage byteArrayToBufferedImage(byte[] arr) {
         ByteArrayInputStream bais = new ByteArrayInputStream(arr);
         try {
-            return ImageIO.read(bais);
+            BufferedImage image = ImageIO.read(bais);
+            return image == null ? null : ImageUtil.copyToArgb(image);
         } catch (IOException e) {
             return null;
         }

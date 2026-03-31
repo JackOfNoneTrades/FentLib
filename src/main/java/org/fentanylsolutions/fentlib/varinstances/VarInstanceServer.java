@@ -13,6 +13,7 @@ import net.minecraft.server.MinecraftServer;
 import org.apache.commons.lang3.Validate;
 import org.fentanylsolutions.fentlib.FentLib;
 import org.fentanylsolutions.fentlib.util.GifUtil;
+import org.fentanylsolutions.fentlib.util.ImageUtil;
 import org.fentanylsolutions.fentlib.util.QoiUtil;
 import org.fentanylsolutions.fentlib.util.WebpUtil;
 
@@ -151,6 +152,7 @@ public class VarInstanceServer {
         if (name.endsWith(".webp")) {
             return WebpUtil.readImage(file);
         }
-        return ImageIO.read(file);
+        BufferedImage image = ImageIO.read(file);
+        return image == null ? null : ImageUtil.copyToArgb(image);
     }
 }

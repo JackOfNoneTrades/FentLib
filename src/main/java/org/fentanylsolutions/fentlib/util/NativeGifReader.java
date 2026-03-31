@@ -49,7 +49,7 @@ public final class NativeGifReader {
             List<Integer> delays = new ArrayList<>();
 
             for (int i = 0; i < frameCount; i++) {
-                BufferedImage rawFrame = reader.read(i);
+                BufferedImage rawFrame = ImageUtil.copyToArgb(reader.read(i));
                 IIOMetadata metadata = reader.getImageMetadata(i);
                 FrameMeta meta = parseFrameMeta(metadata);
 
@@ -100,11 +100,7 @@ public final class NativeGifReader {
     }
 
     private static BufferedImage copyImage(BufferedImage src) {
-        BufferedImage copy = new BufferedImage(src.getWidth(), src.getHeight(), BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g = copy.createGraphics();
-        g.drawImage(src, 0, 0, null);
-        g.dispose();
-        return copy;
+        return ImageUtil.copyToNewArgb(src);
     }
 
     private static FrameMeta parseFrameMeta(IIOMetadata metadata) {
