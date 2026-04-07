@@ -51,10 +51,11 @@ public class FentLib {
     // preInit "Run before anything else. Read your config, create blocks, items, etc, and register them with the
     // GameRegistry." (Remove if not needed)
     public void preInit(FMLPreInitializationEvent event) {
-        confFile = event.getSuggestedConfigurationFile();
+        confFile = resolveConfigFile(event.getSuggestedConfigurationFile());
         String debugVar = System.getenv("MCMODDING_DEBUG_MODE");
         DEBUG_MODE = debugVar != null;
         FentLib.LOG.info("MCMODDING_DEBUG_MODE env var: {}", DEBUG_MODE);
+        FentLib.LOG.info("Using config file {}", confFile);
         proxy.preInit(event);
         FentLib.LOG.info("debugMode config option: {}", Config.debugMode);
         FentLib.LOG.info("isDebugMode: {}", isDebugMode());
@@ -86,6 +87,12 @@ public class FentLib {
         if (isDebugMode()) {
             LOG.info("DEBUG: {}", message);
         }
+    }
+
+    private static File resolveConfigFile(File suggestedConfigFile) {
+        File configDir = suggestedConfigFile.getParentFile();
+        File modConfigDir = new File(configDir, MODID);
+        return new File(modConfigDir, suggestedConfigFile.getName());
     }
 
     /*

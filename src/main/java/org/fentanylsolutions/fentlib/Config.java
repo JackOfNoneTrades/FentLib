@@ -33,6 +33,10 @@ public class Config {
     public static String publicBaseUrl = "";
 
     public static void loadConfig(File configFile) {
+        File parent = configFile.getParentFile();
+        if (parent != null && !parent.isDirectory() && !parent.mkdirs()) {
+            FentLib.LOG.warn("Failed to create config directory {}", parent);
+        }
         config = new Configuration(configFile);
 
         try {
