@@ -134,6 +134,11 @@ public class Mixins extends FentMixins {
             .modid("catalogue")
             .phase(Phase.LATE)
             .build();
+        registry.mixin("MixinVisualManager")
+            .side(Side.CLIENT)
+            .modid("sonicvisuals")
+            .phase(Phase.LATE)
+            .build();
     }
 
     public static java.util.List<String> getEarlyMixinsForLoader() {

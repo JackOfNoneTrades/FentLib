@@ -63,4 +63,7 @@ dependencies {
 
     // Disabled
     // api("club.heiqi:qz_fontrender:1.4.3:dev")
+    //implementation(rfg.deobf("curse.maven:bow-overhaul-240653:2274763"))
+    //implementation(rfg.deobf("curse.maven:enhancedvisuals-255389:2501528"))
+    //runtimeOnlyNonPublishable(rfg.deobf("curse.maven:creativecore-257814:2462369"))
 }
