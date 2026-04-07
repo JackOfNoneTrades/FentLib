@@ -111,11 +111,12 @@ public class Config {
                 "Enable fishing loot table override.");
 
             // HTTP
-            publicBaseUrl = config.getString(
-                "publicBaseUrl",
-                Categories.general,
-                publicBaseUrl,
-                "Public base URL of this server (e.g. http://myserver.example.com:25565). Used by mods to construct externally reachable URLs for HTTP routes.");
+            publicBaseUrl = normalizePublicBaseUrl(
+                config.getString(
+                    "publicBaseUrl",
+                    Categories.general,
+                    publicBaseUrl,
+                    "Public base URL of this server (e.g. myserver.example.com:25565 or https://myserver.example.com). This is the public base only; mods should append their own relative route paths."));
 
             // Misc tweaks
             disableEnderCoreInfoButton = config.getBoolean(
@@ -134,5 +135,58 @@ public class Config {
 
     public static Configuration getRawConfig() {
         return config;
+    }
+
+    /**
+     * Normalizes a public-facing base URL used by sibling mods.
+     * Missing schemes default to plain HTTP because this is commonly the
+     * Minecraft server port rather than a TLS terminator.
+     */
+    public static String normalizePublicBaseUrl(String rawBaseUrl) {
+        String value = rawBaseUrl == null ? "" : rawBaseUrl.trim();
+        while (value.endsWith("/") && !value.isEmpty()) {
+            value = value.substring(0, value.length() - 1);
+        }
+        if (value.isEmpty()) {
+            return "";
+        }
+        if (!looksLikeAbsoluteUrl(value)) {
+            value = "http://" + value;
+        }
+        return value;
+    }
+
+    /**
+     * Builds a public-facing URL by appending a relative route path to the
+     * configured public base URL.
+     *
+     * @return the absolute public URL, or null if publicBaseUrl is unset
+     */
+    public static String buildPublicUrl(String relativePath) {
+        String base = normalizePublicBaseUrl(publicBaseUrl);
+        if (base.isEmpty()) {
+            return null;
+        }
+
+        String normalizedPath = normalizeRelativePath(relativePath);
+        return normalizedPath.isEmpty() ? base : base + "/" + normalizedPath;
+    }
+
+    private static String normalizeRelativePath(String rawPath) {
+        String path = rawPath == null ? "" : rawPath.trim();
+        while (path.startsWith("./")) {
+            path = path.substring(2);
+        }
+        while (path.startsWith("/")) {
+            path = path.substring(1);
+        }
+        while (path.endsWith("/") && !path.isEmpty()) {
+            path = path.substring(0, path.length() - 1);
+        }
+        return path;
+    }
+
+    private static boolean looksLikeAbsoluteUrl(String value) {
+        return value != null && value.contains("://");
     }
 }
