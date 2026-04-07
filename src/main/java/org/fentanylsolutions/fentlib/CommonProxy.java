@@ -8,6 +8,7 @@ import org.fentanylsolutions.fentlib.command.CommandWarpDim;
 import org.fentanylsolutions.fentlib.compat.LoadedMods;
 import org.fentanylsolutions.fentlib.packet.PacketHandler;
 import org.fentanylsolutions.fentlib.services.S00PacketServerInfoModifyService;
+import org.fentanylsolutions.fentlib.services.fishing.FishingLootConfig;
 import org.fentanylsolutions.fentlib.services.http.HttpPortProxyConfig;
 import org.fentanylsolutions.fentlib.util.FileUtil;
 import org.fentanylsolutions.fentlib.util.MiscUtil;
@@ -57,6 +58,7 @@ public class CommonProxy {
             FentLib.fentlibDir.mkdirs();
         }
         FentLib.LOG.info("fentlibDir is located at {}", FentLib.fentlibDir);
+        FishingLootConfig.ensureExists();
         if (MiscUtil.isServer()) {
             HttpPortProxyConfig.ensureExists();
         }

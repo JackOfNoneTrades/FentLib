@@ -27,6 +27,7 @@ public class Config {
     public static int gifSizeCap = 2;
 
     public static boolean useNativeGifReader = true;
+    public static boolean enableFishingLootTable = false;
 
     public static boolean disableEnderCoreInfoButton = true;
 
@@ -102,6 +103,12 @@ public class Config {
                 Categories.general,
                 useNativeGifReader,
                 "Use the pure Java GIF reader instead of scrimage. Disable this to fall back to the scrimage-based reader.");
+
+            enableFishingLootTable = config.getBoolean(
+                "enableFishingLootTable",
+                Categories.general,
+                enableFishingLootTable,
+                "Enable fishing loot table override.");
 
             // HTTP
             publicBaseUrl = config.getString(

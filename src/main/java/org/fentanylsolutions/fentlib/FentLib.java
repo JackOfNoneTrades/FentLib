@@ -2,6 +2,8 @@ package org.fentanylsolutions.fentlib;
 
 import java.io.File;
 
+import net.minecraft.launchwrapper.Launch;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.fentanylsolutions.fentlib.varinstances.VarInstanceClient;
@@ -87,6 +89,17 @@ public class FentLib {
         if (isDebugMode()) {
             LOG.info("DEBUG: {}", message);
         }
+    }
+
+    public static File getConfigDir() {
+        if (confFile != null && confFile.getParentFile() != null) {
+            return confFile.getParentFile();
+        }
+        File minecraftHome = Launch.minecraftHome;
+        if (minecraftHome == null) {
+            minecraftHome = new File(".");
+        }
+        return new File(new File(minecraftHome, "config"), MODID);
     }
 
     private static File resolveConfigFile(File suggestedConfigFile) {

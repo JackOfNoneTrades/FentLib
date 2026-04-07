@@ -52,6 +52,31 @@ public class CommonProxy {
 * QOI image format support and utils thanks to [saharNooby/qoi-java](https://github.com/saharNooby/qoi-java). For usage example, check out how support for `server-icon.qoi` is implemented.
 * WebP image format support and utils thanks to [haraldk/TwelveMonkeys](https://github.com/haraldk/TwelveMonkeys). For usage example, check out how support for `server-icon.webp` is implemented.
 
+## Fishing Loot Config
+Set `enableFishingLootTable=true` in `config/fentlib/fentlib.cfg` to enable FentLib's fishing override. The loot table lives at `config/fentlib/fishing-loot.json`. When enabled, vanilla still decides whether a catch is `fish`, `junk`, or `treasure`, but the item itself comes only from this JSON.
+
+The JSON has top-level `fish`, `junk`, and `treasure` lists. Each entry uses vanilla-style `weight`, supports `count` and `meta` ranges, can be limited to a biome whitelist with `biomes` or inverted into a blacklist with `invertBiomes`, and biome selectors can be numeric IDs, biome names, or `*` to match any biome. Entries can also use explicit numeric enchant IDs or `useVanillaEnchantingRules` for vanilla-style random enchanting.
+
+```json
+{
+  "fish": [
+    {
+      "item": "minecraft:fish",
+      "weight": 60,
+      "count": { "min": 1, "max": 1 },
+      "meta": { "min": 0, "max": 0 }
+    },
+    {
+      "item": "minecraft:fish",
+      "weight": 10,
+      "count": { "min": 1, "max": 2 },
+      "meta": { "min": 1, "max": 1 },
+      "biomes": ["ocean", "river"]
+    }
+  ]
+}
+```
+
 ## Dependencies
 * [UniMixins](https://modrinth.com/mod/unimixins) [![curse](images/icons/curse.png)](https://www.curseforge.com/minecraft/mc-mods/unimixins) [![modrinth](images/icons/modrinth.png)](https://modrinth.com/mod/unimixins/versions) [![git](images/icons/git.png)](https://github.com/LegacyModdingMC/UniMixins/releases)
 

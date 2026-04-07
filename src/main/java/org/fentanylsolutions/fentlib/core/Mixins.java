@@ -98,6 +98,9 @@ public class Mixins extends FentMixins {
         registry.mixin("FeatureExtraPingData$MixinNetworkManager")
             .phase(Phase.EARLY)
             .build();
+        registry.mixin("FeatureFishingLoot$MixinEntityFishHook")
+            .phase(Phase.EARLY)
+            .build();
         registry.mixin("MixinNetworkSystemHttpProxy")
             .phase(Phase.EARLY)
             .side(Side.SERVER)
