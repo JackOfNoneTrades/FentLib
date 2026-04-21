@@ -5,12 +5,12 @@ A shared code library and tweak/fix mod.
 
 [![hub](images/badges/github.png)](https://github.com/JackOfNoneTrades/FentLib/releases)
 [![curse](images/badges/curse.png)](https://www.curseforge.com/minecraft/mc-mods/fentlib)
+[![modrinth](images/badges/modrinth.png)](https://modrinth.com/mod/fentlib)
 [![maven](images/badges/maven.png)](https://maven.fentanylsolutions.org/#/releases/org/fentanylsolutions/fentlib/FentLib)
 ![forge](images/badges/forge.png)
 [![cord](images/badges/cord.png)](https://discord.gg/xAWCqGrguG)
 
-<!--[![modrinth](images/badges/modrinth.png)]()
-[![mcmodcn](images/badges/mcmodcn.png)]()-->
+<!--[![mcmodcn](images/badges/mcmodcn.png)]()-->
 
 ## Features
 * Support for animated GIF server icons. Just drop a `server-icon.gif` file in the server root directory. Size limits are configurable. HodgePodge is a soft dependency, required if you want to use larger GIFs (because of the packet size limit).
