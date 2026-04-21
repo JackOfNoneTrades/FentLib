@@ -17,6 +17,7 @@ public class Config {
     }
 
     public static boolean debugMode;
+    public static boolean logOpenedGuis = false;
     public static boolean printPotions = false;
     public static boolean printMobs = false;
     public static boolean printDimensions = false;
@@ -46,6 +47,11 @@ public class Config {
 
             // Debug
             debugMode = config.getBoolean("debugMode", Categories.debug, debugMode, "Enable debug mode.");
+            logOpenedGuis = config.getBoolean(
+                "logOpenedGuis",
+                Categories.debug,
+                logOpenedGuis,
+                "If set to true, log every GUI opened through Minecraft.displayGuiScreen.");
 
             Property printPotionsProperty = config.get(
                 Categories.debug,
