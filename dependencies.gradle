@@ -55,6 +55,7 @@ dependencies {
     compileOnly("org.lwjgl:lwjgl-sdl:3.4.1")
     compileOnly(rfg.deobf("curse.maven:endercore-231868:4671288")) // Hodgepodge already ports the mod menu, but FentLib still allows to modify both
     compileOnly(rfg.deobf("curse.maven:thaumcraft-223628:2227552")) {transitive=false}
+    compileOnly(rfg.deobf("curse.maven:the-lord-of-the-rings-mod-legacy-423748:3646430"))
 
     // Shadow
     shadowCompile("com.sksamuel.scrimage:scrimage-core:4.4.0-fent")
