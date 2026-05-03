@@ -48,6 +48,17 @@ public class CommonProxy {
 ![Dump example](images/dumper_example.png)
 * `/warpdim` [dimension ID] command. Painlessly warp to a dimension (meant for debugging).
 * `SessionAccessTokenOverrideMixin` allows overriding the session access token in dev launches via `-Dfentlib.accessTokenOverride=<token>`.
+* Client sound utilities to set a custom max attenuation distance without increasing the sound volume. Methods:
+```java
+SoundUtil.withMaxDistance(ISound sound, float maxDistance);
+SoundUtil.playWithMaxDistance(ISound sound, float maxDistance);
+SoundUtil.playWithMaxDistance(SoundHandler soundHandler, ISound sound, float maxDistance);
+SoundUtil.playAt(ResourceLocation soundResource, double x, double y, double z, float volume, float pitch, float maxDistance);
+```
+Example:
+```java
+SoundUtil.playAt(waveSound, x, y, z, 0.25F, 1.0F, 64.0F);
+```
 * HTTP-on-Minecraft-port reverse proxying for local web UIs. Configure path-to-port mappings in `fentlib/http-port-routes.json` so services like Dynmap can be reached through the server port, such as `/dynmap/...`, instead of separate ports.
 Set `publicBaseUrl` in `config/fentlib/fentlib.cfg` to the public base URL of the server; mods should append their own relative route paths on top of it.
 * QOI image format support and utils thanks to [saharNooby/qoi-java](https://github.com/saharNooby/qoi-java). For usage example, check out how support for `server-icon.qoi` is implemented.
