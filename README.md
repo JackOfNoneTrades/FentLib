@@ -6,6 +6,7 @@ A shared code library and tweak/fix mod.
 [![hub](images/badges/github.png)](https://github.com/JackOfNoneTrades/FentLib/releases)
 [![curse](images/badges/curse.png)](https://www.curseforge.com/minecraft/mc-mods/fentlib)
 [![modrinth](images/badges/modrinth.png)](https://modrinth.com/mod/fentlib)
+[![67](images/badges/67.png)](https://67.fentanylsolutions.org/mod/fentlib)
 [![maven](images/badges/maven.png)](https://maven.fentanylsolutions.org/#/releases/org/fentanylsolutions/fentlib/FentLib)
 ![forge](images/badges/forge.png)
 [![cord](images/badges/cord.png)](https://discord.gg/xAWCqGrguG)
