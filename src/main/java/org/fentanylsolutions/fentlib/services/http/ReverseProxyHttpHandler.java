@@ -5,12 +5,19 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import org.fentanylsolutions.fentlib.FentLib;
 
@@ -31,6 +38,35 @@ import io.netty.util.CharsetUtil;
 public class ReverseProxyHttpHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
 
     private static final String CONTENT_TYPE_JSON = "application/json; charset=utf-8";
+
+    /**
+     * Request headers that are forwarded to the upstream. Anything not in this set is dropped to prevent header
+     * smuggling — in particular, attacker-supplied {@code Authorization}, {@code Cookie}, {@code X-Forwarded-*},
+     * and similar trust headers must not reach localhost services that grant privileges to loopback callers.
+     */
+    private static final Set<String> FORWARDED_REQUEST_HEADERS;
+
+    static {
+        Set<String> headers = new HashSet<>(
+            Arrays.asList(
+                "accept",
+                "accept-charset",
+                "accept-encoding",
+                "accept-language",
+                "cache-control",
+                "content-encoding",
+                "content-language",
+                "content-type",
+                "if-match",
+                "if-modified-since",
+                "if-none-match",
+                "if-range",
+                "if-unmodified-since",
+                "pragma",
+                "range",
+                "user-agent"));
+        FORWARDED_REQUEST_HEADERS = Collections.unmodifiableSet(headers);
+    }
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest request) {
@@ -66,7 +102,12 @@ public class ReverseProxyHttpHandler extends SimpleChannelInboundHandler<FullHtt
         }
 
         try {
-            ProxyResponse response = proxy(resolvedRoute.route, upstreamUrl, request);
+            ProxyResponse response = proxy(
+                resolvedRoute.route,
+                upstreamUrl,
+                request,
+                ctx.channel()
+                    .remoteAddress());
             sendResponse(ctx, response);
         } catch (IOException e) {
             FentLib.LOG.warn("Proxy request failed for {} {}: {}", request.getMethod(), uri, e.getMessage());
@@ -84,8 +125,8 @@ public class ReverseProxyHttpHandler extends SimpleChannelInboundHandler<FullHtt
         ctx.close();
     }
 
-    private static ProxyResponse proxy(HttpPortProxyConfig.Route route, String upstreamUrl, FullHttpRequest request)
-        throws IOException {
+    private static ProxyResponse proxy(HttpPortProxyConfig.Route route, String upstreamUrl, FullHttpRequest request,
+        SocketAddress clientAddress) throws IOException {
         HttpURLConnection connection = (HttpURLConnection) new URL(upstreamUrl).openConnection();
         connection.setInstanceFollowRedirects(false);
         connection.setRequestMethod(
@@ -95,7 +136,7 @@ public class ReverseProxyHttpHandler extends SimpleChannelInboundHandler<FullHtt
         connection.setConnectTimeout(5000);
         connection.setReadTimeout(15000);
 
-        copyRequestHeaders(request, connection);
+        copyRequestHeaders(request, connection, clientAddress);
 
         ByteBuf content = request.content();
         if (content.readableBytes() > 0) {
@@ -164,15 +205,35 @@ public class ReverseProxyHttpHandler extends SimpleChannelInboundHandler<FullHtt
         return out.toString();
     }
 
-    private static void copyRequestHeaders(FullHttpRequest request, HttpURLConnection connection) {
+    private static void copyRequestHeaders(FullHttpRequest request, HttpURLConnection connection,
+        SocketAddress clientAddress) {
         for (Map.Entry<String, String> header : request.headers()) {
             String name = header.getKey();
-            if ("host".equalsIgnoreCase(name) || "connection".equalsIgnoreCase(name)
-                || "content-length".equalsIgnoreCase(name)) {
+            if (name == null) {
+                continue;
+            }
+            if (!FORWARDED_REQUEST_HEADERS.contains(name.toLowerCase(Locale.ROOT))) {
                 continue;
             }
             connection.setRequestProperty(name, header.getValue());
         }
+        String clientIp = extractClientIp(clientAddress);
+        if (clientIp != null) {
+            connection.setRequestProperty("X-Forwarded-For", clientIp);
+            connection.setRequestProperty("X-Real-IP", clientIp);
+        }
+        connection.setRequestProperty("X-Forwarded-Proto", "http");
+    }
+
+    private static String extractClientIp(SocketAddress address) {
+        if (address instanceof InetSocketAddress) {
+            InetSocketAddress inet = (InetSocketAddress) address;
+            if (inet.getAddress() != null) {
+                return inet.getAddress()
+                    .getHostAddress();
+            }
+        }
+        return null;
     }
 
     private static Map<String, String> copyResponseHeaders(HttpURLConnection connection,
