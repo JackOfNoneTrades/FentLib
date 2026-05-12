@@ -46,7 +46,7 @@ public class ReverseProxyHttpHandler extends SimpleChannelInboundHandler<FullHtt
         String uri = request.getUri();
         String path = new QueryStringDecoder(uri).path();
         HttpPortProxyConfig config = HttpPortProxyConfig.get();
-        ResolvedRoute resolvedRoute = resolveRoute(config, request, path);
+        ResolvedRoute resolvedRoute = resolveRoute(config, path);
         if (resolvedRoute == null) {
             return false;
         }
@@ -226,24 +226,16 @@ public class ReverseProxyHttpHandler extends SimpleChannelInboundHandler<FullHtt
             .addListener(ChannelFutureListener.CLOSE);
     }
 
-    private static ResolvedRoute resolveRoute(HttpPortProxyConfig config, FullHttpRequest request, String path) {
+    private static ResolvedRoute resolveRoute(HttpPortProxyConfig config, String path) {
         HttpPortProxyConfig.Route directRoute = config.match(path);
-        if (directRoute != null) {
-            return new ResolvedRoute(directRoute, HttpPortProxyConfig.stripRoutePrefix(path, directRoute), true);
-        }
-
-        HttpPortProxyConfig.Route refererRoute = config.matchReferer(
-            request.headers()
-                .get(HttpHeaders.Names.REFERER));
-        if (refererRoute == null) {
+        if (directRoute == null) {
             return null;
         }
-
-        return new ResolvedRoute(refererRoute, HttpPortProxyConfig.normalizeRequestPath(path), false);
+        return new ResolvedRoute(directRoute, HttpPortProxyConfig.stripRoutePrefix(path, directRoute));
     }
 
     private static boolean shouldRedirectToMountedDirectory(String path, ResolvedRoute resolvedRoute) {
-        return resolvedRoute.directMatch && ("/" + resolvedRoute.route.path).equals(path);
+        return ("/" + resolvedRoute.route.path).equals(path);
     }
 
     private static String addTrailingSlash(String uri) {
@@ -318,12 +310,10 @@ public class ReverseProxyHttpHandler extends SimpleChannelInboundHandler<FullHtt
 
         private final HttpPortProxyConfig.Route route;
         private final String routeRelativePath;
-        private final boolean directMatch;
 
-        private ResolvedRoute(HttpPortProxyConfig.Route route, String routeRelativePath, boolean directMatch) {
+        private ResolvedRoute(HttpPortProxyConfig.Route route, String routeRelativePath) {
             this.route = route;
             this.routeRelativePath = routeRelativePath;
-            this.directMatch = directMatch;
         }
     }
 }

@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -156,19 +155,6 @@ public final class HttpPortProxyConfig {
         Route removed = apiRoutes.remove(normalized);
         if (removed != null) {
             FentLib.LOG.info("Unregistered API HTTP route '{}'", normalized);
-        }
-    }
-
-    public Route matchReferer(String referer) {
-        if (referer == null || referer.trim()
-            .isEmpty()) {
-            return null;
-        }
-        try {
-            URI uri = URI.create(referer.trim());
-            return match(uri.getPath());
-        } catch (Exception e) {
-            return null;
         }
     }
 
