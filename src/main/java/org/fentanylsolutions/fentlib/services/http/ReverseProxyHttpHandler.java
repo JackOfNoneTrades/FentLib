@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -55,8 +56,17 @@ public class ReverseProxyHttpHandler extends SimpleChannelInboundHandler<FullHtt
             return true;
         }
 
+        String upstreamUrl = buildUpstreamUrl(resolvedRoute.route, uri, resolvedRoute.routeRelativePath);
+        if (upstreamUrl == null) {
+            sendJson(
+                ctx,
+                HttpResponseStatus.BAD_REQUEST,
+                "{\"error\":\"BadRequest\",\"errorMessage\":\"Request path is not within the mounted route\"}");
+            return true;
+        }
+
         try {
-            ProxyResponse response = proxy(resolvedRoute, request);
+            ProxyResponse response = proxy(resolvedRoute.route, upstreamUrl, request);
             sendResponse(ctx, response);
         } catch (IOException e) {
             FentLib.LOG.warn("Proxy request failed for {} {}: {}", request.getMethod(), uri, e.getMessage());
@@ -74,8 +84,8 @@ public class ReverseProxyHttpHandler extends SimpleChannelInboundHandler<FullHtt
         ctx.close();
     }
 
-    private static ProxyResponse proxy(ResolvedRoute resolvedRoute, FullHttpRequest request) throws IOException {
-        String upstreamUrl = buildUpstreamUrl(resolvedRoute.route, request.getUri(), resolvedRoute.routeRelativePath);
+    private static ProxyResponse proxy(HttpPortProxyConfig.Route route, String upstreamUrl, FullHttpRequest request)
+        throws IOException {
         HttpURLConnection connection = (HttpURLConnection) new URL(upstreamUrl).openConnection();
         connection.setInstanceFollowRedirects(false);
         connection.setRequestMethod(
@@ -99,26 +109,59 @@ public class ReverseProxyHttpHandler extends SimpleChannelInboundHandler<FullHtt
 
         int status = connection.getResponseCode();
         byte[] body = readBody(connection);
-        Map<String, String> headers = copyResponseHeaders(connection, resolvedRoute.route);
+        Map<String, String> headers = copyResponseHeaders(connection, route);
         return new ProxyResponse(status, body, headers);
     }
 
-    private static String buildUpstreamUrl(HttpPortProxyConfig.Route route, String uri, String routeRelativePath) {
-        StringBuilder builder = new StringBuilder();
-        builder.append("http://127.0.0.1:")
-            .append(route.targetPort)
-            .append(route.normalizedTargetPathPrefix());
-        if (!routeRelativePath.isEmpty()) {
-            if (builder.charAt(builder.length() - 1) != '/') {
-                builder.append('/');
-            }
-            builder.append(routeRelativePath);
+    /**
+     * Builds the upstream URL after verifying that the requested path stays within the route's mounted prefix.
+     * Returns {@code null} if the request would escape the mount (path traversal via {@code ..}, percent-encoded
+     * dots, embedded slashes, NUL, or backslash).
+     */
+    static String buildUpstreamUrl(HttpPortProxyConfig.Route route, String requestUri, String rawRelativePath) {
+        String prefix = route.normalizedTargetPathPrefix();
+        String basePath = prefix.equals("/") ? "/" : prefix + "/";
+
+        String decodedRelative;
+        try {
+            decodedRelative = new URI(null, null, "/" + rawRelativePath, null).getPath();
+        } catch (URISyntaxException e) {
+            return null;
         }
-        int queryIndex = uri.indexOf('?');
+        if (decodedRelative == null) {
+            return null;
+        }
+        if (decodedRelative.indexOf('\0') >= 0 || decodedRelative.indexOf('\\') >= 0) {
+            return null;
+        }
+        while (decodedRelative.startsWith("/")) {
+            decodedRelative = decodedRelative.substring(1);
+        }
+
+        URI resolved;
+        try {
+            URI base = new URI("http", null, "127.0.0.1", route.targetPort, basePath, null, null);
+            URI relative = new URI(null, null, decodedRelative, null);
+            resolved = base.resolve(relative)
+                .normalize();
+        } catch (URISyntaxException e) {
+            return null;
+        }
+
+        String resolvedPath = resolved.getPath();
+        if (resolvedPath == null || !resolvedPath.startsWith(basePath)) {
+            return null;
+        }
+        if (!"127.0.0.1".equals(resolved.getHost()) || resolved.getPort() != route.targetPort) {
+            return null;
+        }
+
+        StringBuilder out = new StringBuilder(resolved.toString());
+        int queryIndex = requestUri.indexOf('?');
         if (queryIndex >= 0) {
-            builder.append(uri.substring(queryIndex));
+            out.append(requestUri.substring(queryIndex));
         }
-        return builder.toString();
+        return out.toString();
     }
 
     private static void copyRequestHeaders(FullHttpRequest request, HttpURLConnection connection) {
