@@ -59,23 +59,72 @@ public class ClientUtil {
     }
 
     public static void drawPlayerFace(ResourceLocation rl, float xPos, float yPos, float alpha, int size) {
-        if (rl != null) {
-            FentLib.varInstanceClient.minecraftRef.getTextureManager()
-                .bindTexture(rl);
-            GL11.glColor4f(1.0F, 1.0F, 1.0F, alpha);
+        drawPlayerFace(rl, null, xPos, yPos, size, size, alpha);
+    }
 
-            if (useNewSkinFormat()) {
-                // Draw base face: (8, 8) to (16, 16)
-                drawTexFloat(xPos, yPos, 8, 8, 8, 8, size, size, 64.0F, 64.0F);
+    public static void drawPlayerFace(ResourceLocation rl, float xPos, float yPos, float alpha) {
+        drawPlayerFace(rl, null, xPos, yPos, 8, 8, alpha);
+    }
 
-                // Draw overlay (hat layer): (40, 8) to (48, 16)
-                // Render it with alpha so it looks like a layer
-                GL11.glEnable(GL11.GL_ALPHA_TEST);
-                drawTexFloat(xPos, yPos, 40, 8, 8, 8, size, size, 64.0F, 64.0F);
-            } else {
-                // Old skin format
-                drawTexFloat(xPos, yPos, 8, 14, 8, 18, size, size, 64.0F, 64.0F);
+    public static void drawPlayerFace(ResourceLocation rl, ResourceLocation fallback, float xPos, float yPos, int width,
+        int height, float alpha) {
+        ResourceLocation bound = bindTextureOrFallback(rl, fallback);
+        if (bound == null) {
+            return;
+        }
+
+        int texWidth = GL11.glGetTexLevelParameteri(GL11.GL_TEXTURE_2D, 0, GL11.GL_TEXTURE_WIDTH);
+        int texHeight = GL11.glGetTexLevelParameteri(GL11.GL_TEXTURE_2D, 0, GL11.GL_TEXTURE_HEIGHT);
+        if (texWidth <= 0 || texHeight <= 0) {
+            texWidth = 64;
+            texHeight = 64;
+        }
+
+        boolean legacyLayout = texWidth == texHeight * 2;
+        float uScale = texWidth / 64.0F;
+        float vScale = texHeight / (legacyLayout ? 32.0F : 64.0F);
+        int sampleW = Math.max(1, Math.round(8.0F * uScale));
+        int sampleH = Math.max(1, Math.round(8.0F * vScale));
+
+        GL11.glColor4f(1.0F, 1.0F, 1.0F, alpha);
+        drawTexFloat(xPos, yPos, 8.0F * uScale, 8.0F * vScale, sampleW, sampleH, width, height, texWidth, texHeight);
+
+        float hatU = 40.0F * uScale;
+        float hatV = 8.0F * vScale;
+        if (hatU + sampleW <= texWidth && hatV + sampleH <= texHeight) {
+            GL11.glEnable(GL11.GL_ALPHA_TEST);
+            drawTexFloat(xPos, yPos, hatU, hatV, sampleW, sampleH, width, height, texWidth, texHeight);
+        }
+    }
+
+    private static ResourceLocation bindTextureOrFallback(ResourceLocation primary, ResourceLocation fallback) {
+        if (bindTexture(primary)) {
+            return primary;
+        }
+        if (fallback != null && !fallback.equals(primary) && bindTexture(fallback)) {
+            return fallback;
+        }
+        return null;
+    }
+
+    private static boolean bindTexture(ResourceLocation location) {
+        if (location == null) {
+            return false;
+        }
+
+        try {
+            Minecraft mc = FentLib.varInstanceClient != null && FentLib.varInstanceClient.minecraftRef != null
+                ? FentLib.varInstanceClient.minecraftRef
+                : Minecraft.getMinecraft();
+            if (mc == null || mc.getTextureManager() == null) {
+                return false;
             }
+            mc.getTextureManager()
+                .bindTexture(location);
+            return true;
+        } catch (RuntimeException e) {
+            FentLib.debug("Failed to bind player face texture '" + location + "': " + e.getMessage());
+            return false;
         }
     }
 
