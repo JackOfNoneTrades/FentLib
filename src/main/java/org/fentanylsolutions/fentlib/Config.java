@@ -33,6 +33,7 @@ public class Config {
     public static boolean disableEnderCoreInfoButton = true;
 
     public static String publicBaseUrl = "";
+    public static String serverIconDirectory = "";
 
     public static void loadConfig(File configFile) {
         File parent = configFile.getParentFile();
@@ -116,6 +117,14 @@ public class Config {
                 enableFishingLootTable,
                 "Enable fishing loot table override.");
 
+            serverIconDirectory = normalizeOptionalPath(
+                config.getString(
+                    "serverIconDirectory",
+                    Categories.general,
+                    serverIconDirectory,
+                    "Directory to search for server icons. Leave empty to use the default server root. "
+                        + "Relative paths are resolved from the server root; absolute paths are used directly."));
+
             // HTTP
             publicBaseUrl = normalizePublicBaseUrl(
                 config.getString(
@@ -190,6 +199,10 @@ public class Config {
             path = path.substring(0, path.length() - 1);
         }
         return path;
+    }
+
+    private static String normalizeOptionalPath(String rawPath) {
+        return rawPath == null ? "" : rawPath.trim();
     }
 
     private static boolean looksLikeAbsoluteUrl(String value) {

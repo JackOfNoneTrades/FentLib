@@ -11,6 +11,7 @@ import javax.imageio.ImageIO;
 import net.minecraft.server.MinecraftServer;
 
 import org.apache.commons.lang3.Validate;
+import org.fentanylsolutions.fentlib.Config;
 import org.fentanylsolutions.fentlib.FentLib;
 import org.fentanylsolutions.fentlib.util.GifUtil;
 import org.fentanylsolutions.fentlib.util.ImageUtil;
@@ -30,12 +31,9 @@ public class VarInstanceServer {
 
     public void loadFavicons() {
         // --- Static icon (png > qoi > webp, skip animated webp) ---
-        File pngFile = MinecraftServer.getServer()
-            .getFile("server-icon.png");
-        File qoiFile = MinecraftServer.getServer()
-            .getFile("server-icon.qoi");
-        File webpFile = MinecraftServer.getServer()
-            .getFile("server-icon.webp");
+        File pngFile = getServerIconFile("server-icon.png");
+        File qoiFile = getServerIconFile("server-icon.qoi");
+        File webpFile = getServerIconFile("server-icon.webp");
         boolean webpIsAnimated = false;
         if (webpFile.isFile()) {
             try {
@@ -58,8 +56,7 @@ public class VarInstanceServer {
         }
 
         // --- Animated icon (gif > animated webp) ---
-        File gifFile = MinecraftServer.getServer()
-            .getFile("server-icon.gif");
+        File gifFile = getServerIconFile("server-icon.gif");
         if (gifFile.isFile()) {
             loadAnimatedFavicon(gifFile, false);
         } else if (webpIsAnimated) {
@@ -68,6 +65,29 @@ public class VarInstanceServer {
             FentLib.LOG.info("Animated server icon not found");
             animatedFaviconBlob = null;
         }
+    }
+
+    private File getServerIconFile(String fileName) {
+        File configuredDirectory = getServerIconDirectory();
+        if (configuredDirectory == null) {
+            return MinecraftServer.getServer()
+                .getFile(fileName);
+        }
+        return new File(configuredDirectory, fileName);
+    }
+
+    private File getServerIconDirectory() {
+        String configuredDirectory = Config.serverIconDirectory == null ? "" : Config.serverIconDirectory.trim();
+        if (configuredDirectory.isEmpty()) {
+            return null;
+        }
+
+        File directory = new File(configuredDirectory);
+        if (directory.isAbsolute()) {
+            return directory;
+        }
+        return MinecraftServer.getServer()
+            .getFile(configuredDirectory);
     }
 
     private void loadAnimatedFavicon(File file, boolean isWebp) {

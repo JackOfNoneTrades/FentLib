@@ -64,6 +64,7 @@ SoundUtil.playAt(waveSound, x, y, z, 0.25F, 1.0F, 64.0F);
 Set `publicBaseUrl` in `config/fentlib/fentlib.cfg` to the public base URL of the server; mods should append their own relative route paths on top of it.
 * QOI image format support and utils thanks to [saharNooby/qoi-java](https://github.com/saharNooby/qoi-java). For usage example, check out how support for `server-icon.qoi` is implemented.
 * WebP image format support and utils thanks to [haraldk/TwelveMonkeys](https://github.com/haraldk/TwelveMonkeys). For usage example, check out how support for `server-icon.webp` is implemented.
+* Default server icon path can be configured using the `serverIconDirectory` config option.
 
 ## Fishing Loot Config
 Set `enableFishingLootTable=true` in `config/fentlib/fentlib.cfg` to enable FentLib's fishing override. The loot table lives at `config/fentlib/fishing-loot.json`. When enabled, vanilla still decides whether a catch is `fish`, `junk`, or `treasure`, but the item itself comes only from this JSON.
