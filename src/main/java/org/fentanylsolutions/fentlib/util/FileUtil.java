@@ -141,37 +141,25 @@ public class FileUtil {
             }
         }
 
-        boolean awtDesktopFailed = false;
-
-        try {
-            Class<?> oclass = Class.forName("java.awt.Desktop");
-            Object object = oclass.getMethod("getDesktop", new Class[0])
-                .invoke(null);
-            oclass.getMethod("browse", new Class[] { URI.class })
-                .invoke(object, folder.toURI());
+        if (openFolderWithAwtDesktop(folder)) {
             return true;
-        } catch (Throwable throwable) {
-            FentLib.LOG.error("Problem opening folder", throwable);
-            awtDesktopFailed = true;
         }
 
-        if (awtDesktopFailed) {
-            FentLib.LOG.info("Opening folder via system class fallback");
+        FentLib.LOG.info("Opening folder via system class fallback");
+        try {
+            Class<?> sysX = Class.forName("org.lwjglx.Sys");
+            Object ok = sysX.getMethod("openURL", String.class)
+                .invoke(null, "file://" + absolutePath);
+            if (ok instanceof Boolean) {
+                return (Boolean) ok;
+            }
+            return true;
+        } catch (Throwable ignored) {
             try {
-                Class<?> sysX = Class.forName("org.lwjglx.Sys");
-                Object ok = sysX.getMethod("openURL", String.class)
-                    .invoke(null, "file://" + absolutePath);
-                if (ok instanceof Boolean) {
-                    return (Boolean) ok;
-                }
+                Sys.openURL("file://" + absolutePath);
                 return true;
-            } catch (Throwable ignored) {
-                try {
-                    Sys.openURL("file://" + absolutePath);
-                    return true;
-                } catch (Throwable t) {
-                    FentLib.LOG.error("Failed to open folder via Sys fallback", t);
-                }
+            } catch (Throwable t) {
+                FentLib.LOG.error("Failed to open folder via Sys fallback", t);
             }
         }
 
@@ -583,6 +571,41 @@ public class FileUtil {
         } catch (Throwable ignored) {
             return false;
         }
+    }
+
+    private static boolean openFolderWithAwtDesktop(File folder) {
+        try {
+            Class<?> desktopCls = Class.forName("java.awt.Desktop");
+            Boolean desktopSupported = (Boolean) desktopCls.getMethod("isDesktopSupported")
+                .invoke(null);
+            if (!desktopSupported) {
+                return false;
+            }
+
+            Object desktop = desktopCls.getMethod("getDesktop")
+                .invoke(null);
+            Class<?> actionCls = Class.forName("java.awt.Desktop$Action");
+            Object openAction = Enum.valueOf((Class<Enum>) actionCls.asSubclass(Enum.class), "OPEN");
+            if ((Boolean) desktopCls.getMethod("isSupported", actionCls)
+                .invoke(desktop, openAction)) {
+                desktopCls.getMethod("open", File.class)
+                    .invoke(desktop, folder);
+                return true;
+            }
+
+            Object browseAction = Enum.valueOf((Class<Enum>) actionCls.asSubclass(Enum.class), "BROWSE");
+            if ((Boolean) desktopCls.getMethod("isSupported", actionCls)
+                .invoke(desktop, browseAction)) {
+                desktopCls.getMethod("browse", URI.class)
+                    .invoke(desktop, folder.toURI());
+                return true;
+            }
+        } catch (UnsupportedOperationException ignored) {
+            return false;
+        } catch (Throwable throwable) {
+            FentLib.LOG.debug("AWT Desktop could not open folder", throwable);
+        }
+        return false;
     }
 
     private static boolean openWithLwjgl3ifyDesktop(URI uri) {
