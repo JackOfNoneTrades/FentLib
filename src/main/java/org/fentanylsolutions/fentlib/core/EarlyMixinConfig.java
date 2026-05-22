@@ -11,6 +11,7 @@ import net.minecraft.launchwrapper.Launch;
 public final class EarlyMixinConfig {
 
     private static final String CONFIG_FILE_NAME = "fentlib-early.properties";
+    private static final String CONFIG_DIR_NAME = "fentlib";
     private static final String JAR_DISCOVERER_KEY = "mixin.jarDiscoverer";
     private static final boolean DEFAULT_JAR_DISCOVERER = false;
     private static final boolean ENABLE_JAR_DISCOVERER = loadBoolean(JAR_DISCOVERER_KEY, DEFAULT_JAR_DISCOVERER);
@@ -64,6 +65,6 @@ public final class EarlyMixinConfig {
         if (minecraftHome == null) {
             minecraftHome = new File(".");
         }
-        return new File(minecraftHome, "config");
+        return new File(new File(minecraftHome, "config"), CONFIG_DIR_NAME);
     }
 }

@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import net.minecraft.launchwrapper.Launch;
-
 import org.fentanylsolutions.fentlib.FentLib;
 
 import com.google.gson.Gson;
@@ -32,6 +30,7 @@ public final class HttpPortProxyConfig {
 
     public static final class Route {
 
+        public Boolean enabled = Boolean.TRUE;
         public String path = "";
         public int targetPort;
         public String targetPathPrefix = "/";
@@ -64,15 +63,20 @@ public final class HttpPortProxyConfig {
         public boolean isValid() {
             return !normalizedPath().isEmpty() && targetPort > 0 && targetPort <= 65535;
         }
+
+        public boolean isEnabled() {
+            return enabled == null || enabled.booleanValue();
+        }
     }
 
     private HttpPortProxyConfig sanitized() {
         HttpPortProxyConfig result = new HttpPortProxyConfig();
         for (Route route : routes == null ? Collections.<Route>emptyList() : routes) {
-            if (route == null || !route.isValid()) {
+            if (route == null || !route.isEnabled() || !route.isValid()) {
                 continue;
             }
             Route sanitizedRoute = new Route();
+            sanitizedRoute.enabled = Boolean.TRUE;
             sanitizedRoute.path = route.normalizedPath();
             sanitizedRoute.targetPort = route.targetPort;
             sanitizedRoute.targetPathPrefix = route.normalizedTargetPathPrefix();
@@ -241,6 +245,7 @@ public final class HttpPortProxyConfig {
     private static HttpPortProxyConfig defaultConfig() {
         HttpPortProxyConfig config = new HttpPortProxyConfig();
         Route route = new Route();
+        route.enabled = Boolean.TRUE;
         route.path = "dynmap";
         route.targetPort = 8123;
         route.targetPathPrefix = "/";
@@ -256,11 +261,7 @@ public final class HttpPortProxyConfig {
         if (FentLib.fentlibDir != null) {
             return FentLib.fentlibDir;
         }
-        File minecraftHome = Launch.minecraftHome;
-        if (minecraftHome == null) {
-            minecraftHome = new File(".");
-        }
-        return new File(minecraftHome, FentLib.MODID);
+        return FentLib.getConfigDir();
     }
 
 }

@@ -1,7 +1,5 @@
 package org.fentanylsolutions.fentlib;
 
-import java.io.File;
-
 import org.fentanylsolutions.fentlib.command.CommandDumpThaumonomicon;
 import org.fentanylsolutions.fentlib.command.CommandReloadServerIcon;
 import org.fentanylsolutions.fentlib.command.CommandWarpDim;
@@ -10,7 +8,6 @@ import org.fentanylsolutions.fentlib.packet.PacketHandler;
 import org.fentanylsolutions.fentlib.services.S00PacketServerInfoModifyService;
 import org.fentanylsolutions.fentlib.services.fishing.FishingLootConfig;
 import org.fentanylsolutions.fentlib.services.http.HttpPortProxyConfig;
-import org.fentanylsolutions.fentlib.util.FileUtil;
 import org.fentanylsolutions.fentlib.util.MiscUtil;
 import org.fentanylsolutions.fentlib.varinstances.VarInstanceCommon;
 import org.fentanylsolutions.fentlib.varinstances.VarInstanceServer;
@@ -53,7 +50,7 @@ public class CommonProxy {
             S00PacketServerInfoModifyService.registerHandler((s, j) -> { return FentLib.MODID; });
         }
         Config.loadConfig(FentLib.confFile);
-        FentLib.fentlibDir = new File(FileUtil.getMinecraftDir(), FentLib.MODID);
+        FentLib.fentlibDir = FentLib.getConfigDir();
         if (!FentLib.fentlibDir.exists()) {
             FentLib.fentlibDir.mkdirs();
         }
