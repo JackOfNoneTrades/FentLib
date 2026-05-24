@@ -103,7 +103,7 @@ The JSON has top-level `fish`, `junk`, and `treasure` lists. Each entry uses van
 
 ## License
 
-`LgplV3 + SNEED`.
+`LGPLv3`.
 
 ## Buy me a coffee
 
@@ -112,4 +112,4 @@ The JSON has top-level `fish`, `junk`, and `treasure` lists. Each entry uses van
 
 <br>
 
-![license](images/lgplsneed_small.png)
+![license](images/license_small.png)
