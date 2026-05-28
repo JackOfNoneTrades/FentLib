@@ -16,6 +16,9 @@ public class Config {
         public static final String miscTweaks = "misc-tweaks";
     }
 
+    public static final int DEFAULT_SODIUM_GUI_ACCENT_COLOR = 0xFF94E4D3;
+    public static final String DEFAULT_SODIUM_GUI_ACCENT_COLOR_VALUE = "#94E4D3";
+
     public static boolean debugMode;
     public static boolean logOpenedGuis = false;
     public static boolean printPotions = false;
@@ -34,6 +37,8 @@ public class Config {
 
     public static String publicBaseUrl = "";
     public static String serverIconDirectory = "";
+
+    public static int sodiumGuiAccentColor = DEFAULT_SODIUM_GUI_ACCENT_COLOR;
 
     public static void loadConfig(File configFile) {
         File parent = configFile.getParentFile();
@@ -133,6 +138,17 @@ public class Config {
                     publicBaseUrl,
                     "Public base URL of this server (e.g. myserver.example.com:25565 or https://myserver.example.com). This is the public base only; mods should append their own relative route paths."));
 
+            Property sodiumGuiAccentColorProperty = config.get(
+                Categories.general,
+                "sodiumGuiAccentColor",
+                DEFAULT_SODIUM_GUI_ACCENT_COLOR_VALUE,
+                "Default sodiumgui accent color used when callers do not provide their own. "
+                    + "Accepts #RRGGBB, #AARRGGBB, 0xRRGGBB, or 0xAARRGGBB.");
+            sodiumGuiAccentColor = parseColorProperty(
+                sodiumGuiAccentColorProperty,
+                DEFAULT_SODIUM_GUI_ACCENT_COLOR,
+                DEFAULT_SODIUM_GUI_ACCENT_COLOR_VALUE);
+
             // Misc tweaks
             disableEnderCoreInfoButton = config.getBoolean(
                 "disableEnderCoreInfoButton",
@@ -203,6 +219,40 @@ public class Config {
 
     private static String normalizeOptionalPath(String rawPath) {
         return rawPath == null ? "" : rawPath.trim();
+    }
+
+    private static int parseColorProperty(Property property, int fallbackColor, String fallbackValue) {
+        String value = property.getString();
+        try {
+            return parseColor(value);
+        } catch (IllegalArgumentException e) {
+            FentLib.LOG.warn("Invalid color config value '{}'; using {}.", value, fallbackValue);
+            property.set(fallbackValue);
+            return fallbackColor;
+        }
+    }
+
+    private static int parseColor(String rawColor) {
+        String value = rawColor == null ? "" : rawColor.trim();
+        if (value.startsWith("#")) {
+            value = value.substring(1);
+        } else if (value.startsWith("0x") || value.startsWith("0X")) {
+            value = value.substring(2);
+        }
+
+        if (value.length() != 6 && value.length() != 8) {
+            throw new IllegalArgumentException("Expected 6 or 8 hex digits");
+        }
+
+        try {
+            long parsed = Long.parseLong(value, 16);
+            if (value.length() == 6) {
+                parsed |= 0xFF000000L;
+            }
+            return (int) parsed;
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Expected a hex color", e);
+        }
     }
 
     private static boolean looksLikeAbsoluteUrl(String value) {
