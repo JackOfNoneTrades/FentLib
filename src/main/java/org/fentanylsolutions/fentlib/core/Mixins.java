@@ -155,6 +155,18 @@ public class Mixins extends FentMixins {
             .modid("sonicvisuals")
             .phase(Phase.LATE)
             .build();
+        registry.mixin("MixinEntityPlayerPreview")
+            .side(Side.CLIENT)
+            .modid("betterquesting")
+            .extraModid("BetterQuesting")
+            .phase(Phase.LATE)
+            .build();
+        registry.mixin("MixinPanelPlayerPortrait")
+            .side(Side.CLIENT)
+            .modid("betterquesting")
+            .extraModid("BetterQuesting")
+            .phase(Phase.LATE)
+            .build();
         registry.mixin("MixinLOTRGuiMap")
             .side(Side.CLIENT)
             .modid("lotr")
