@@ -172,6 +172,11 @@ public class Mixins extends FentMixins {
             .modid("lotr")
             .phase(Phase.LATE)
             .build();
+        registry.mixin("MixinVoiceHandler")
+            .side(Side.BOTH)
+            .modid("ServerTools")
+            .phase(Phase.LATE)
+            .build();
     }
 
     public static java.util.List<String> getEarlyMixinsForLoader() {

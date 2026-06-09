@@ -6,18 +6,16 @@ A shared code library and tweak/fix mod.
 [![hub](images/badges/github.png)](https://github.com/JackOfNoneTrades/FentLib/releases)
 [![curse](images/badges/curse.png)](https://www.curseforge.com/minecraft/mc-mods/fentlib)
 [![modrinth](images/badges/modrinth.png)](https://modrinth.com/mod/fentlib)
+[![mcmodcn](images/badges/mcmodcn.png)](https://www.mcmod.cn/class/27311.html)
 [![67](images/badges/67.png)](https://67.fentanylsolutions.org/mod/fentlib)
 [![maven](images/badges/maven.png)](https://maven.fentanylsolutions.org/#/releases/org/fentanylsolutions/fentlib/FentLib)
 ![forge](images/badges/forge.png)
 [![cord](images/badges/cord.png)](https://discord.gg/xAWCqGrguG)
 
-<!--[![mcmodcn](images/badges/mcmodcn.png)]()-->
-
 ## Features
 * Support for animated GIF server icons. Just drop a `server-icon.gif` file in the server root directory. Size limits are configurable. HodgePodge is a soft dependency, required if you want to use larger GIFs (because of the packet size limit).
 ![animated_server_icons](images/animated_server_icons.gif)
 Use the `/reload_icon` command to reload the icon. Also works for `server-icon.png`.
-* Removal of EnderCore / HodgePodge Info Button in the mod list screen.
 * API to modify the `S00PacketServerInfo` packet. Example:
 ```java
 public class ClientProxy extends CommonProxy {
@@ -90,6 +88,12 @@ The JSON has top-level `fish`, `junk`, and `treasure` lists. Each entry uses van
   ]
 }
 ```
+
+## Patches
+* Removal of [EnderCore](https://www.curseforge.com/minecraft/mc-mods/endercore) / [HodgePodge](https://github.com/GTNewHorizons/Hodgepodge) Info Button in the mod list screen.
+* [LOTR](https://www.curseforge.com/minecraft/mc-mods/the-lord-of-the-rings-mod-legacy) map player face modern skin support.
+* [Better Questing](https://github.com/GTNewHorizons/BetterQuesting) modern skin support.
+* [Server Tools](https://www.curseforge.com/minecraft/mc-mods/forgeservertools) singleplayer crash with Wawel Auth fix.
 
 ## Dependencies
 * [UniMixins](https://modrinth.com/mod/unimixins) [![curse](images/icons/curse.png)](https://www.curseforge.com/minecraft/mc-mods/unimixins) [![modrinth](images/icons/modrinth.png)](https://modrinth.com/mod/unimixins/versions) [![git](images/icons/git.png)](https://github.com/LegacyModdingMC/UniMixins/releases)
