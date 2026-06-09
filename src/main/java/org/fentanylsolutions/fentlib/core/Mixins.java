@@ -155,6 +155,11 @@ public class Mixins extends FentMixins {
             .modid("sonicvisuals")
             .phase(Phase.LATE)
             .build();
+        registry.mixin("MixinLOTRGuiMap")
+            .side(Side.CLIENT)
+            .modid("lotr")
+            .phase(Phase.LATE)
+            .build();
     }
 
     public static java.util.List<String> getEarlyMixinsForLoader() {
