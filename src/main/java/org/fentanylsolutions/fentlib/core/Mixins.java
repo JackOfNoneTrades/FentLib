@@ -172,6 +172,12 @@ public class Mixins extends FentMixins {
             .modid("lotr")
             .phase(Phase.LATE)
             .build();
+        registry.mixin("MixinModernTabRenderer")
+            .side(Side.CLIENT)
+            .modid("serverutilities")
+            .extraModid("ServerUtilities")
+            .phase(Phase.LATE)
+            .build();
         registry.mixin("MixinVoiceHandler")
             .side(Side.BOTH)
             .modid("ServerTools")

@@ -94,6 +94,7 @@ The JSON has top-level `fish`, `junk`, and `treasure` lists. Each entry uses van
 * [LOTR](https://www.curseforge.com/minecraft/mc-mods/the-lord-of-the-rings-mod-legacy) map player face modern skin support.
 * [Better Questing](https://github.com/GTNewHorizons/BetterQuesting) modern skin support.
 * [Server Tools](https://www.curseforge.com/minecraft/mc-mods/forgeservertools) singleplayer crash with Wawel Auth fix.
+* [Server Utilities](https://github.com/GTNewHorizons/ServerUtilities) modern skin support.
 
 ## Dependencies
 * [UniMixins](https://modrinth.com/mod/unimixins) [![curse](images/icons/curse.png)](https://www.curseforge.com/minecraft/mc-mods/unimixins) [![modrinth](images/icons/modrinth.png)](https://modrinth.com/mod/unimixins/versions) [![git](images/icons/git.png)](https://github.com/LegacyModdingMC/UniMixins/releases)
