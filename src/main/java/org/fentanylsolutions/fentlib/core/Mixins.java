@@ -117,7 +117,7 @@ public class Mixins extends FentMixins {
             .modid("lotr")
             .phase(Phase.EARLY)
             .build();
-        registry.mixin("MixinNetworkSystemHttpProxy")
+        registry.mixin("MixinNetworkSystemPortUnification")
             .phase(Phase.EARLY)
             .side(Side.SERVER)
             .build();
