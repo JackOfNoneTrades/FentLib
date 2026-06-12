@@ -122,6 +122,28 @@ public class Mixins extends FentMixins {
             .side(Side.SERVER)
             .build();
 
+        // IPv6 support for vanilla IP handling
+        registry.mixin("MixinBanListIpv6")
+            .phase(Phase.EARLY)
+            .side(Side.SERVER)
+            .build();
+        registry.mixin("MixinEntityPlayerMPIpv6")
+            .phase(Phase.EARLY)
+            .side(Side.SERVER)
+            .build();
+        registry.mixin("MixinNetHandlerLoginServerIpv6")
+            .phase(Phase.EARLY)
+            .side(Side.SERVER)
+            .build();
+        registry.mixin("MixinCommandBanIpIpv6")
+            .phase(Phase.EARLY)
+            .side(Side.SERVER)
+            .build();
+        registry.mixin("MixinCommandPardonIpIpv6")
+            .phase(Phase.EARLY)
+            .side(Side.SERVER)
+            .build();
+
         // Other Accessors
         registry.mixin("AccessorWidget")
             .side(Side.CLIENT)
