@@ -143,6 +143,18 @@ public class Mixins extends FentMixins {
             .phase(Phase.EARLY)
             .side(Side.SERVER)
             .build();
+        registry.mixin("FeatureIpv6Lan$MixinThreadLanServerPing")
+            .phase(Phase.EARLY)
+            .side(Side.CLIENT)
+            .build();
+        registry.mixin("FeatureIpv6Lan$MixinThreadLanServerFind")
+            .phase(Phase.EARLY)
+            .side(Side.CLIENT)
+            .build();
+        registry.mixin("FeatureIpv6Lan$MixinLanServerList")
+            .phase(Phase.EARLY)
+            .side(Side.CLIENT)
+            .build();
 
         // Other Accessors
         registry.mixin("AccessorWidget")
