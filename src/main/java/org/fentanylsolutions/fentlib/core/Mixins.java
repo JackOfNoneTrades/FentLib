@@ -74,6 +74,10 @@ public class Mixins extends FentMixins {
             .side(Side.CLIENT)
             .phase(Phase.EARLY)
             .build();
+        registry.mixin("MixinServerAddress")
+            .side(Side.CLIENT)
+            .phase(Phase.EARLY)
+            .build();
         registry.mixin("FeatureServerListReorder$MixinGuiMultiplayer")
             .side(Side.CLIENT)
             .phase(Phase.EARLY)
