@@ -1,14 +1,22 @@
 package org.fentanylsolutions.fentlib.util;
 
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.net.UnknownHostException;
 
 /**
  * Helpers for parsing and formatting network addresses in an IPv4/IPv6-safe way.
  */
 public final class NetworkAddressUtil {
 
+    public static final int LAN_DISCOVERY_PORT = 4445;
+
     private NetworkAddressUtil() {}
+
+    public static InetAddress lanDiscoveryIpv6Group() throws UnknownHostException {
+        return InetAddress.getByName("ff02::2:60");
+    }
 
     /**
      * Extracts an IP literal from a socket address.

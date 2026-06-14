@@ -110,29 +110,35 @@ public class FeatureAnimatedIcon {
             ServerData serverData = cir.getReturnValue();
             IAnimatedServerData animated = (IAnimatedServerData) serverData;
 
-            String animatedIconHash = nbtCompound.getString("animatedIconHash");
-            // nbtCompound.getString returns an empty string if entry not found...
-            if (!animatedIconHash.isEmpty()) {
-                FentLib.debug("Got animatedIconHash: " + animatedIconHash);
-                String hash = animatedIconHash.substring(4);
-                String blob = loadIconFromFile(hash);
-                if (blob != null) {
-                    serverData.func_147407_a(blob); // Restore actual blob to memory
-                    animated.setIsAnimatedIcon(true);
-                    FentLib.debug("Loaded animated icon from file: " + hash);
+            // An exception escaping this hook makes vanilla discard the entire server list
+            try {
+                String animatedIconHash = nbtCompound.getString("animatedIconHash");
+                if (animatedIconHash.startsWith("gif:") && animatedIconHash.length() > 4) {
+                    FentLib.debug("Got animatedIconHash: " + animatedIconHash);
+                    String hash = animatedIconHash.substring(4);
+                    String blob = loadIconFromFile(hash);
+                    if (blob != null) {
+                        serverData.func_147407_a(blob); // Restore actual blob to memory
+                        animated.setIsAnimatedIcon(true);
+                        FentLib.debug("Loaded animated icon from file: " + hash);
+                    } else {
+                        // File missing, clear icon
+                        serverData.func_147407_a(null);
+                        animated.setIsAnimatedIcon(false);
+                        FentLib.LOG.warn("Animated icon file missing: {}", hash);
+                    }
+                } else if (!animatedIconHash.isEmpty()) {
+                    FentLib.LOG.warn("Ignoring malformed animatedIconHash: {}", animatedIconHash);
                 } else {
-                    // File missing, clear icon
-                    serverData.func_147407_a(null);
-                    animated.setIsAnimatedIcon(false);
-                    FentLib.LOG.warn("Animated icon file missing: {}", hash);
+                    FentLib.debug("animatedIconHash is null");
                 }
-            } else {
-                FentLib.debug("animatedIconHash is null");
-            }
-            if (nbtCompound.hasKey("animatedIcon")) {
-                animated.setIsAnimatedIcon(nbtCompound.getBoolean("animatedIcon"));
-            } else {
-                animated.setIsAnimatedIcon(false);
+                if (nbtCompound.hasKey("animatedIcon")) {
+                    animated.setIsAnimatedIcon(nbtCompound.getBoolean("animatedIcon"));
+                } else {
+                    animated.setIsAnimatedIcon(false);
+                }
+            } catch (Exception e) {
+                FentLib.LOG.error("Failed to restore animated icon, keeping server entry", e);
             }
         }
 

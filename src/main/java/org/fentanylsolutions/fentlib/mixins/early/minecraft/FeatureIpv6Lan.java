@@ -5,7 +5,6 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
-import java.net.UnknownHostException;
 
 import net.minecraft.client.multiplayer.ThreadLanServerPing;
 import net.minecraft.client.network.LanServerDetector;
@@ -26,13 +25,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
  */
 public final class FeatureIpv6Lan {
 
-    static final int LAN_DISCOVERY_PORT = 4445;
-
     private FeatureIpv6Lan() {}
-
-    static InetAddress ipv6Group() throws UnknownHostException {
-        return InetAddress.getByName("ff02::2:60");
-    }
 
     @Mixin(ThreadLanServerPing.class)
     public abstract static class MixinThreadLanServerPing {
@@ -51,7 +44,12 @@ public final class FeatureIpv6Lan {
                 ipv4Failure = e;
             }
             try {
-                socket.send(new DatagramPacket(packet.getData(), packet.getLength(), ipv6Group(), LAN_DISCOVERY_PORT));
+                socket.send(
+                    new DatagramPacket(
+                        packet.getData(),
+                        packet.getLength(),
+                        NetworkAddressUtil.lanDiscoveryIpv6Group(),
+                        NetworkAddressUtil.LAN_DISCOVERY_PORT));
             } catch (IOException e) {
                 if (ipv4Failure != null) {
                     throw ipv4Failure;
@@ -77,7 +75,7 @@ public final class FeatureIpv6Lan {
                 ipv4Failure = e;
             }
             try {
-                socket.joinGroup(ipv6Group());
+                socket.joinGroup(NetworkAddressUtil.lanDiscoveryIpv6Group());
             } catch (IOException e) {
                 if (ipv4Failure != null) {
                     throw ipv4Failure;
