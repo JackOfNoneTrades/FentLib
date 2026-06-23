@@ -112,6 +112,15 @@ public final class WindowDropTarget {
                         FentLib.LOG.error("[WindowDropTarget] Listener onDropText failed", t);
                     }
                 }
+                scheduleOnMainThread(() -> {
+                    for (DropListener l : LISTENERS) {
+                        try {
+                            l.onDragText(text);
+                        } catch (Throwable t) {
+                            FentLib.LOG.error("[WindowDropTarget] Listener onDragText failed", t);
+                        }
+                    }
+                });
             } else if (type == SDLEvents.SDL_EVENT_DROP_FILE) {
                 SDL_DropEvent drop = sdlEvent.drop();
                 pendingDropFile = drop.dataString();
@@ -127,6 +136,15 @@ public final class WindowDropTarget {
                         FentLib.LOG.error("[WindowDropTarget] Listener onDropFile failed", t);
                     }
                 }
+                scheduleOnMainThread(() -> {
+                    for (DropListener l : LISTENERS) {
+                        try {
+                            l.onDragFile(file, x, y);
+                        } catch (Throwable t) {
+                            FentLib.LOG.error("[WindowDropTarget] Listener onDragFile failed", t);
+                        }
+                    }
+                });
             } else if (type == SDLEvents.SDL_EVENT_DROP_POSITION) {
                 SDL_DropEvent drop = sdlEvent.drop();
                 lastDropX = drop.x();
@@ -140,6 +158,15 @@ public final class WindowDropTarget {
                         FentLib.LOG.error("[WindowDropTarget] Listener onDragPosition failed", t);
                     }
                 }
+                scheduleOnMainThread(() -> {
+                    for (DropListener l : LISTENERS) {
+                        try {
+                            l.onDragPositionMainThread(x, y);
+                        } catch (Throwable t) {
+                            FentLib.LOG.error("[WindowDropTarget] Listener onDragPositionMainThread failed", t);
+                        }
+                    }
+                });
             } else if (type == SDLEvents.SDL_EVENT_DROP_COMPLETE) {
                 String text = pendingDropText;
                 String file = pendingDropFile;
