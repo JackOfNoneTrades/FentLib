@@ -23,7 +23,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import com.cleanroommc.catalogue.client.IModData;
+import com.cleanroommc.catalogue.client.data.IModData;
 import com.cleanroommc.catalogue.client.screen.CatalogueModListScreen;
 
 @Mixin(CatalogueModListScreen.class)
