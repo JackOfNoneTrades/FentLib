@@ -188,6 +188,11 @@ public class Mixins extends FentMixins {
             .modid("catalogue")
             .phase(Phase.LATE)
             .build();
+        registry.mixin("MixinClientHelper")
+            .side(Side.CLIENT)
+            .modid("clearmybackground")
+            .phase(Phase.LATE)
+            .build();
         registry.mixin("MixinVisualManager")
             .side(Side.CLIENT)
             .modid("sonicvisuals")

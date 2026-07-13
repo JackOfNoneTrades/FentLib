@@ -34,6 +34,7 @@ public class Config {
     public static boolean enableFishingLootTable = false;
 
     public static boolean disableEnderCoreInfoButton = true;
+    public static boolean milkyPanorama = true;
 
     public static String publicBaseUrl = "";
     public static String serverIconDirectory = "";
@@ -155,6 +156,12 @@ public class Config {
                 Categories.miscTweaks,
                 disableEnderCoreInfoButton,
                 "Disable the EnderCore information button in the modlist screen.");
+
+            milkyPanorama = config.getBoolean(
+                "milkyPanorama",
+                Categories.miscTweaks,
+                milkyPanorama,
+                "Apply the vanilla title screen's milky gradient to panorama backgrounds.");
 
             FentLib.varInstanceCommon.buildPassiveMobList();
         } catch (Exception e) {
