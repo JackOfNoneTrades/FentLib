@@ -47,6 +47,10 @@ public class Mixins extends FentMixins {
             .phase(Phase.EARLY)
             .side(Side.CLIENT)
             .build();
+        registry.mixin("MixinSourceLWJGLOpenAL")
+            .phase(Phase.EARLY)
+            .side(Side.CLIENT)
+            .build();
 
         // Minecraft Mixins
         registry.mixin("EntityLivingBaseMixin")

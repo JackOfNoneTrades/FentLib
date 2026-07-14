@@ -12,7 +12,7 @@ import cpw.mods.fml.relauncher.SideOnly;
  * distance.
  */
 @SideOnly(Side.CLIENT)
-public class MaxDistanceSound implements ITickableSound, ICustomMaxDistanceSound {
+public class MaxDistanceSound implements ITickableSound, ICustomMaxDistanceSound, ICustomSourceRadiusSound {
 
     private final ISound delegate;
     private final ITickableSound tickableDelegate;
@@ -35,6 +35,11 @@ public class MaxDistanceSound implements ITickableSound, ICustomMaxDistanceSound
     @Override
     public float getMaxSoundDistance() {
         return this.maxDistance;
+    }
+
+    @Override
+    public float getSoundSourceRadius() {
+        return SoundUtil.getSourceRadius(this.delegate);
     }
 
     @Override

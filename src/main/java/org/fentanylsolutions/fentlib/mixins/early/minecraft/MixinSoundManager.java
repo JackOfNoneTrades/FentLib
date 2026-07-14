@@ -36,4 +36,17 @@ public abstract class MixinSoundManager {
     private float fentlib$customMaxDistance(float vanillaMaxDistance, @Local(argsOnly = true) ISound sound) {
         return SoundUtil.getEffectiveMaxDistance(sound, vanillaMaxDistance);
     }
+
+    @ModifyArg(
+        method = "playSound",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/client/audio/SoundManager$SoundSystemStarterThread;play(Ljava/lang/String;)V",
+            remap = false),
+        require = 1,
+        index = 0)
+    private String fentlib$registerSourceRadius(String sourceName, @Local(argsOnly = true) ISound sound) {
+        SoundUtil.registerSourceRadius(sourceName, sound);
+        return sourceName;
+    }
 }

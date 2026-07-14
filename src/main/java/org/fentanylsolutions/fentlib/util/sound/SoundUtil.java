@@ -1,5 +1,8 @@
 package org.fentanylsolutions.fentlib.util.sound;
 
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.ISound;
 import net.minecraft.client.audio.PositionedSoundRecord;
@@ -13,6 +16,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 public final class SoundUtil {
 
     private static final float VANILLA_SOUND_DISTANCE = 16.0F;
+    private static final ConcurrentMap<String, Float> PENDING_SOURCE_RADII = new ConcurrentHashMap<>();
 
     private SoundUtil() {}
 
@@ -56,6 +60,27 @@ public final class SoundUtil {
         }
 
         return vanillaMaxDistance;
+    }
+
+    public static void registerSourceRadius(String sourceName, ISound sound) {
+        if (sourceName == null || sound == null) {
+            return;
+        }
+
+        float radius = getSourceRadius(sound);
+        if (radius > 0.0F) {
+            PENDING_SOURCE_RADII.put(sourceName, Float.valueOf(radius));
+        }
+    }
+
+    public static float getSourceRadius(ISound sound) {
+        return sound instanceof ICustomSourceRadiusSound ? ((ICustomSourceRadiusSound) sound).getSoundSourceRadius()
+            : 0.0F;
+    }
+
+    public static float takeSourceRadius(String sourceName) {
+        Float radius = PENDING_SOURCE_RADII.remove(sourceName);
+        return radius != null ? radius.floatValue() : 0.0F;
     }
 
     public static float getVanillaMaxDistance(ISound sound) {
