@@ -185,6 +185,7 @@ if (configuredCurseForgeProjectId.isNotEmpty()) {
         artifact.releaseType = modVersionProvider.map { if (it.endsWith("-pre")) "beta" else "release" }
         artifact.addGameVersion(configuredMinecraftVersion, "Forge")
         artifact.addModLoader("Forge")
+        artifact.addEnvironment("Client", "Server")
 
         configuredCurseForgeRelations.split(";")
             .map { it.trim() }
