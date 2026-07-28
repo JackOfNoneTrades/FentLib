@@ -77,6 +77,6 @@ public class CommandDumpThaumonomicon implements ICommand {
 
     @Override
     public int compareTo(Object o) {
-        return 0;
+        return getCommandName().compareTo(((ICommand) o).getCommandName());
     }
 }
