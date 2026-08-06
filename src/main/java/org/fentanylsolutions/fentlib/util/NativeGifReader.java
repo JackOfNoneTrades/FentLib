@@ -6,6 +6,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -29,8 +30,11 @@ public final class NativeGifReader {
         ImageInputStream stream = null;
         try {
             stream = ImageIO.createImageInputStream(new ByteArrayInputStream(gifBytes));
-            reader = ImageIO.getImageReadersByFormatName("gif")
-                .next();
+            Iterator<ImageReader> readers = ImageIO.getImageReadersByFormatName("gif");
+            if (!readers.hasNext()) {
+                throw new IOException("No GIF reader is available");
+            }
+            reader = readers.next();
             reader.setInput(stream);
 
             int frameCount = reader.getNumImages(true);

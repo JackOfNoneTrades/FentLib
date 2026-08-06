@@ -16,10 +16,6 @@ import net.minecraft.client.renderer.texture.DynamicTexture;
 import org.fentanylsolutions.fentlib.Config;
 import org.fentanylsolutions.fentlib.FentLib;
 
-import com.sksamuel.scrimage.nio.AnimatedGif;
-import com.sksamuel.scrimage.nio.AnimatedGifReader;
-import com.sksamuel.scrimage.nio.ImageSource;
-
 public class GifUtil {
 
     public static class GifData {
@@ -81,33 +77,11 @@ public class GifUtil {
     }
 
     /**
-     * Reads an animated GIF into a GifData using the configured backend.
+     * Reads an animated GIF into a GifData using the in-house pure Java reader.
      */
     public static GifData readGif(byte[] gifBytes) throws IOException {
-        if (Config.useNativeGifReader) {
-            FentLib.debug("Reading GIF with native reader");
-            return NativeGifReader.read(gifBytes);
-        }
-        FentLib.debug("Reading GIF with scrimage reader");
-        return readGifWithScrimage(gifBytes);
-    }
-
-    private static GifData readGifWithScrimage(byte[] gifBytes) throws IOException {
-        AnimatedGif gif = AnimatedGifReader.read(ImageSource.of(new ByteArrayInputStream(gifBytes)));
-        int frameCount = gif.getFrameCount();
-        if (frameCount == 0) {
-            throw new IOException("No frames found in GIF");
-        }
-
-        BufferedImage[] frames = new BufferedImage[frameCount];
-        int[] delays = new int[frameCount];
-        for (int i = 0; i < frameCount; i++) {
-            frames[i] = gif.getFrame(i)
-                .awt();
-            delays[i] = (int) gif.getDelay(i)
-                .toMillis();
-        }
-        return new GifData(frames, delays);
+        FentLib.debug("Reading GIF with native reader");
+        return NativeGifReader.read(gifBytes);
     }
 
     /**

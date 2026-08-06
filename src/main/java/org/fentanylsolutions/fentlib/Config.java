@@ -30,7 +30,6 @@ public class Config {
     public static int maxGifFrameCount = 1000;
     public static int gifSizeCap = 2;
 
-    public static boolean useNativeGifReader = true;
     public static boolean enableFishingLootTable = false;
 
     public static boolean disableEnderCoreInfoButton = true;
@@ -51,6 +50,8 @@ public class Config {
         try {
             FentLib.debug("Loading config");
             config.load();
+            config.getCategory(Categories.general)
+                .remove("useNativeGifReader");
 
             // Debug
             debugMode = config.getBoolean("debugMode", Categories.debug, debugMode, "Enable debug mode.");
@@ -110,12 +111,6 @@ public class Config {
                 1,
                 10,
                 "Gif size cap in megabytes after being stitched into a png spritesheet.");
-
-            useNativeGifReader = config.getBoolean(
-                "useNativeGifReader",
-                Categories.general,
-                useNativeGifReader,
-                "Use the pure Java GIF reader instead of scrimage. Disable this to fall back to the scrimage-based reader.");
 
             enableFishingLootTable = config.getBoolean(
                 "enableFishingLootTable",
