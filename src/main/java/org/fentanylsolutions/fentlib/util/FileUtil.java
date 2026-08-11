@@ -23,6 +23,9 @@ import org.lwjgl.Sys;
 
 public class FileUtil {
 
+    private static final String POJAV_CALLBACK_BRIDGE = "org.lwjgl.glfw.CallbackBridge";
+    private static final int POJAV_OPEN_ACTION = 2002;
+
     public static void writeFileBytes(File file, byte[] data) throws IOException {
         FileOutputStream fos = new FileOutputStream(file);
         fos.write(data);
@@ -141,6 +144,11 @@ public class FileUtil {
             }
         }
 
+        String folderUrl = "file://" + absolutePath;
+        if (openWithPojavBridge(folderUrl)) {
+            return true;
+        }
+
         if (openFolderWithAwtDesktop(folder)) {
             return true;
         }
@@ -149,14 +157,14 @@ public class FileUtil {
         try {
             Class<?> sysX = Class.forName("org.lwjglx.Sys");
             Object ok = sysX.getMethod("openURL", String.class)
-                .invoke(null, "file://" + absolutePath);
+                .invoke(null, folderUrl);
             if (ok instanceof Boolean) {
                 return (Boolean) ok;
             }
             return true;
         } catch (Throwable ignored) {
             try {
-                Sys.openURL("file://" + absolutePath);
+                Sys.openURL(folderUrl);
                 return true;
             } catch (Throwable t) {
                 FentLib.LOG.error("Failed to open folder via Sys fallback", t);
@@ -226,6 +234,14 @@ public class FileUtil {
     public static FilePickerResult pickFile(String title, File initialDirectory, String... extensions) {
         if (extensions == null || extensions.length == 0) {
             extensions = new String[] { "png", "gif" };
+        }
+
+        // Pojav-based launchers run Minecraft in a regular Linux JVM, but desktop picker
+        // implementations such as TinyFD and AWT cannot display an Android document picker.
+        // Report this as unavailable so callers can present their manual/in-game fallback
+        // instead of interpreting TinyFD's null result as a user cancellation.
+        if (hasPojavBridge()) {
+            return FilePickerResult.unavailable(GuiText.tr("fentlib.gui.file_picker.unavailable"));
         }
 
         if (isMacOs()) {
@@ -617,6 +633,38 @@ public class FileUtil {
                 .invoke(desktop, uri);
             return true;
         } catch (Throwable ignored) {
+            return false;
+        }
+    }
+
+    private static boolean hasPojavBridge() {
+        try {
+            Class<?> bridgeCls = Class.forName(POJAV_CALLBACK_BRIDGE, false, FileUtil.class.getClassLoader());
+            bridgeCls.getMethod("nativeClipboard", int.class, byte[].class);
+            return true;
+        } catch (Throwable ignored) {
+            return false;
+        }
+    }
+
+    private static boolean openWithPojavBridge(String url) {
+        if (url == null || !hasPojavBridge()) {
+            return false;
+        }
+
+        try {
+            byte[] utf8 = url.getBytes("UTF-8");
+            // Pojav's JNI clipboard/open bridge consumes a C string, so its byte array must
+            // include the trailing NUL that LWJGL's own callers normally provide.
+            byte[] nulTerminated = new byte[utf8.length + 1];
+            System.arraycopy(utf8, 0, nulTerminated, 0, utf8.length);
+
+            Class<?> bridgeCls = Class.forName(POJAV_CALLBACK_BRIDGE);
+            bridgeCls.getMethod("nativeClipboard", int.class, byte[].class)
+                .invoke(null, POJAV_OPEN_ACTION, nulTerminated);
+            return true;
+        } catch (Throwable throwable) {
+            FentLib.LOG.debug("Pojav Android bridge could not open URI", throwable);
             return false;
         }
     }
