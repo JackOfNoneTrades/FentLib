@@ -37,8 +37,11 @@ import me.eigenraven.lwjgl3ify.api.Lwjgl3Aware;
 @SideOnly(Side.CLIENT)
 public final class WindowDropTarget {
 
+    private static final String SDL_EVENT_FILTER_CLASS = "org.lwjgl.sdl.SDL_EventFilterI";
     private static final WindowDropTarget INSTANCE = new WindowDropTarget();
+    private static volatile boolean registrationAttempted;
     private static volatile boolean registered;
+    private boolean watchInstallAttempted;
     private boolean watchInstalled;
 
     /** Strong reference to prevent GC while SDL holds the native pointer. */
@@ -55,9 +58,17 @@ public final class WindowDropTarget {
     private WindowDropTarget() {}
 
     public static synchronized void register() {
-        if (registered) return;
+        if (registrationAttempted) return;
+        registrationAttempted = true;
         if (!Loader.isModLoaded("lwjgl3ify")) {
             FentLib.LOG.info("[WindowDropTarget] lwjgl3ify not present, drag-and-drop support disabled");
+            return;
+        }
+        try {
+            Class.forName(SDL_EVENT_FILTER_CLASS, false, WindowDropTarget.class.getClassLoader());
+        } catch (ClassNotFoundException | LinkageError e) {
+            FentLib.LOG
+                .info("[WindowDropTarget] lwjgl3ify does not provide SDL3 drag-and-drop support; support disabled");
             return;
         }
         FMLCommonHandler.instance()
@@ -79,8 +90,13 @@ public final class WindowDropTarget {
     @SubscribeEvent
     public void onClientTick(TickEvent.ClientTickEvent event) {
         if (event.phase != TickEvent.Phase.START) return;
-        if (!watchInstalled) {
-            installEventWatch();
+        if (!watchInstalled && !watchInstallAttempted) {
+            watchInstallAttempted = true;
+            try {
+                installEventWatch();
+            } catch (LinkageError | RuntimeException e) {
+                FentLib.LOG.warn("[WindowDropTarget] Failed to install SDL drag-and-drop support; support disabled", e);
+            }
         }
     }
 
