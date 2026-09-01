@@ -14,10 +14,19 @@ public class Config {
         public static final String debug = "debug";
         public static final String general = "general";
         public static final String miscTweaks = "misc-tweaks";
+        public static final String catalogueVintage = miscTweaks + ".catalogue-vintage";
+    }
+
+    public enum CatalogueSortOrder {
+        ALPHABETICALLY,
+        ALPHABETICALLY_REVERSED,
+        FAVOURITES_FIRST
     }
 
     public static final int DEFAULT_SODIUM_GUI_ACCENT_COLOR = 0xFF94E4D3;
     public static final String DEFAULT_SODIUM_GUI_ACCENT_COLOR_VALUE = "#94E4D3";
+    private static final String[] CATALOGUE_SORT_ORDER_VALUES = { CatalogueSortOrder.ALPHABETICALLY.name(),
+        CatalogueSortOrder.ALPHABETICALLY_REVERSED.name(), CatalogueSortOrder.FAVOURITES_FIRST.name() };
 
     public static boolean debugMode;
     public static boolean logOpenedGuis = false;
@@ -34,6 +43,12 @@ public class Config {
 
     public static boolean disableEnderCoreInfoButton = true;
     public static boolean milkyPanorama = true;
+    public static boolean persistCataloguePreferences = true;
+    public static CatalogueSortOrder catalogueSortOrder = CatalogueSortOrder.FAVOURITES_FIRST;
+    public static boolean catalogueConfigsOnly = false;
+    public static boolean catalogueFavouritesOnly = false;
+    public static boolean catalogueHideLibraries = true;
+    public static boolean catalogueHideChildMods = true;
 
     public static String publicBaseUrl = "";
     public static String serverIconDirectory = "";
@@ -52,6 +67,13 @@ public class Config {
             config.load();
             config.getCategory(Categories.general)
                 .remove("useNativeGifReader");
+            migrateProperty(
+                Categories.miscTweaks,
+                "rememberCatalogueSorting",
+                Categories.catalogueVintage,
+                "persistPreferences");
+            migrateProperty(Categories.miscTweaks, "catalogueSortOrder", Categories.catalogueVintage, "sortOrder");
+            repairBooleanProperty(Categories.catalogueVintage, "persistPreferences", true);
 
             // Debug
             debugMode = config.getBoolean("debugMode", Categories.debug, debugMode, "Enable debug mode.");
@@ -158,6 +180,8 @@ public class Config {
                 milkyPanorama,
                 "Apply the vanilla title screen's milky gradient to panorama backgrounds.");
 
+            loadCataloguePreferences();
+
             FentLib.varInstanceCommon.buildPassiveMobList();
         } catch (Exception e) {
             FentLib.LOG.error("Error loading config: ", e);
@@ -168,6 +192,59 @@ public class Config {
 
     public static Configuration getRawConfig() {
         return config;
+    }
+
+    public static void refreshCataloguePreferences() {
+        if (config != null) {
+            loadCataloguePreferences();
+        }
+    }
+
+    public static void saveCataloguePreferences(CatalogueSortOrder sortOrder, boolean configsOnly,
+        boolean favouritesOnly, boolean hideLibraries, boolean hideChildMods) {
+        CatalogueSortOrder normalizedSortOrder = sortOrder == null ? CatalogueSortOrder.FAVOURITES_FIRST : sortOrder;
+        boolean changed = normalizedSortOrder != catalogueSortOrder || configsOnly != catalogueConfigsOnly
+            || favouritesOnly != catalogueFavouritesOnly
+            || hideLibraries != catalogueHideLibraries
+            || hideChildMods != catalogueHideChildMods;
+        if (!changed) {
+            return;
+        }
+
+        catalogueSortOrder = normalizedSortOrder;
+        catalogueConfigsOnly = configsOnly;
+        catalogueFavouritesOnly = favouritesOnly;
+        catalogueHideLibraries = hideLibraries;
+        catalogueHideChildMods = hideChildMods;
+        if (config != null) {
+            config
+                .get(
+                    Categories.catalogueVintage,
+                    "sortOrder",
+                    CatalogueSortOrder.FAVOURITES_FIRST.name(),
+                    "Sort order used by Catalogue Vintage.",
+                    CATALOGUE_SORT_ORDER_VALUES)
+                .set(catalogueSortOrder.name());
+            config
+                .get(
+                    Categories.catalogueVintage,
+                    "configsOnly",
+                    false,
+                    "Show only mods with configuration screens in Catalogue Vintage.")
+                .set(catalogueConfigsOnly);
+            config
+                .get(
+                    Categories.catalogueVintage,
+                    "favouritesOnly",
+                    false,
+                    "Show only favourited mods in Catalogue Vintage.")
+                .set(catalogueFavouritesOnly);
+            config.get(Categories.catalogueVintage, "hideLibraries", true, "Hide library mods in Catalogue Vintage.")
+                .set(catalogueHideLibraries);
+            config.get(Categories.catalogueVintage, "hideChildMods", true, "Hide child mods in Catalogue Vintage.")
+                .set(catalogueHideChildMods);
+            config.save();
+        }
     }
 
     /**
@@ -221,6 +298,81 @@ public class Config {
 
     private static String normalizeOptionalPath(String rawPath) {
         return rawPath == null ? "" : rawPath.trim();
+    }
+
+    private static CatalogueSortOrder parseCatalogueSortOrder(String rawSortOrder) {
+        String sortOrder = rawSortOrder == null ? "" : rawSortOrder.trim();
+        for (CatalogueSortOrder value : CatalogueSortOrder.values()) {
+            if (value.name()
+                .equalsIgnoreCase(sortOrder)) {
+                return value;
+            }
+        }
+        return CatalogueSortOrder.FAVOURITES_FIRST;
+    }
+
+    private static void loadCataloguePreferences() {
+        persistCataloguePreferences = config.getBoolean(
+            "persistPreferences",
+            Categories.catalogueVintage,
+            true,
+            "Synchronize Catalogue Vintage's sorting and filtering preferences with FentLib.");
+
+        Property catalogueSortOrderProperty = config.get(
+            Categories.catalogueVintage,
+            "sortOrder",
+            CatalogueSortOrder.FAVOURITES_FIRST.name(),
+            "Sort order used by Catalogue Vintage.",
+            CATALOGUE_SORT_ORDER_VALUES);
+        catalogueSortOrder = parseCatalogueSortOrder(catalogueSortOrderProperty.getString());
+        catalogueSortOrderProperty.set(catalogueSortOrder.name());
+
+        catalogueConfigsOnly = config.getBoolean(
+            "configsOnly",
+            Categories.catalogueVintage,
+            false,
+            "Show only mods with configuration screens in Catalogue Vintage.");
+        catalogueFavouritesOnly = config.getBoolean(
+            "favouritesOnly",
+            Categories.catalogueVintage,
+            false,
+            "Show only favourited mods in Catalogue Vintage.");
+        catalogueHideLibraries = config
+            .getBoolean("hideLibraries", Categories.catalogueVintage, true, "Hide library mods in Catalogue Vintage.");
+        catalogueHideChildMods = config
+            .getBoolean("hideChildMods", Categories.catalogueVintage, true, "Hide child mods in Catalogue Vintage.");
+    }
+
+    private static void migrateProperty(String oldCategory, String oldName, String newCategory, String newName) {
+        if (!config.hasKey(oldCategory, oldName)) {
+            return;
+        }
+        if (!config.hasKey(newCategory, newName)) {
+            Property property = config.getCategory(oldCategory)
+                .remove(oldName);
+            property.setName(newName);
+            config.getCategory(newCategory)
+                .put(newName, property);
+            return;
+        }
+        config.getCategory(oldCategory)
+            .remove(oldName);
+    }
+
+    private static void repairBooleanProperty(String category, String name, boolean defaultValue) {
+        if (!config.hasKey(category, name)) {
+            return;
+        }
+        Property property = config.getCategory(category)
+            .get(name);
+        if (property.getType() == Property.Type.BOOLEAN) {
+            return;
+        }
+
+        boolean value = property.getBoolean(defaultValue);
+        config.getCategory(category)
+            .remove(name);
+        config.get(category, name, value);
     }
 
     private static int parseColorProperty(Property property, int fallbackColor, String fallbackValue) {
