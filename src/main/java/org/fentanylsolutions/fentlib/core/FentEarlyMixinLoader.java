@@ -11,6 +11,10 @@ import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
 @IFMLLoadingPlugin.MCVersion("1.7.10")
 public abstract class FentEarlyMixinLoader implements IEarlyMixinLoader, IFMLLoadingPlugin {
 
+    static {
+        DepLoaderLaunchTransformer.registerEarly();
+    }
+
     @Override
     public String getMixinConfig() {
         throw new AssertionError();

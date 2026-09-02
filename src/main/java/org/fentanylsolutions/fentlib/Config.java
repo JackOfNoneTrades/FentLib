@@ -43,6 +43,7 @@ public class Config {
 
     public static boolean disableEnderCoreInfoButton = true;
     public static boolean milkyPanorama = true;
+    public static boolean terminalDepLoaderProgress = true;
     public static boolean persistCataloguePreferences = true;
     public static CatalogueSortOrder catalogueSortOrder = CatalogueSortOrder.FAVOURITES_FIRST;
     public static boolean catalogueConfigsOnly = false;
@@ -179,6 +180,13 @@ public class Config {
                 Categories.miscTweaks,
                 milkyPanorama,
                 "Apply the vanilla title screen's milky gradient to panorama backgrounds.");
+
+            terminalDepLoaderProgress = config.getBoolean(
+                "terminalDepLoaderProgress",
+                Categories.miscTweaks,
+                terminalDepLoaderProgress,
+                "Show FalsePattern DepLoader download progress in the terminal instead of a graphical window. "
+                    + "This takes effect on the next launch.");
 
             loadCataloguePreferences();
 
