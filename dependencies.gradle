@@ -49,6 +49,8 @@ dependencies {
     devOnlyNonPublishable(rfg.deobf("curse.maven:catalogue-vintage-1465746:8384975")) // 1.0.8-1.7.10
     devOnlyNonPublishable("com.falsepattern:falsepatternlib-mc1.7.10:1.12.2:dev")
     devOnlyNonPublishable("com.github.GTNewHorizons:ServerUtilities:2.4.10:dev")
+    devOnlyNonPublishable("ganymedes01.etfuturum:Et-Futurum-Requiem:2.6.58-GTNH:dev")
+
 
     // Pure compile
     devOnlyNonPublishable("com.github.GTNewHorizons:ModularUI2:2.3.89-1.7.10:dev")
