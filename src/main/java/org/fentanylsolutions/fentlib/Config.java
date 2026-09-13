@@ -44,6 +44,7 @@ public class Config {
     public static boolean disableEnderCoreInfoButton = true;
     public static boolean milkyPanorama = true;
     public static boolean terminalDepLoaderProgress = true;
+    public static boolean fixEtFuturumBoatRendering = false;
     public static boolean persistCataloguePreferences = true;
     public static CatalogueSortOrder catalogueSortOrder = CatalogueSortOrder.FAVOURITES_FIRST;
     public static boolean catalogueConfigsOnly = false;
@@ -187,6 +188,16 @@ public class Config {
                 terminalDepLoaderProgress,
                 "Show FalsePattern DepLoader download progress in the terminal instead of a graphical window. "
                     + "This takes effect on the next launch.");
+
+            Property fixEtFuturumBoatRenderingProperty = config.get(
+                Categories.miscTweaks,
+                "fixEtFuturumBoatRendering",
+                false,
+                "Fix Et Futurum Requiem boats appearing filled in or flat with Angelica's entity batching. "
+                    + "Disables batching only for EFR boat and chest boat renderers, preserving their invisible water mask. "
+                    + "Requires a restart.");
+            fixEtFuturumBoatRenderingProperty.setRequiresMcRestart(true);
+            fixEtFuturumBoatRendering = fixEtFuturumBoatRenderingProperty.getBoolean();
 
             loadCataloguePreferences();
 

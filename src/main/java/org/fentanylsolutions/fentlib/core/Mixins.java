@@ -172,6 +172,11 @@ public class Mixins extends FentMixins {
             .build();
 
         // Other mixins
+        registry.mixin("MixinNewBoatRenderer")
+            .side(Side.CLIENT)
+            .modid("etfuturum")
+            .phase(Phase.LATE)
+            .build();
         registry.mixin("MixinGuiEnhancedModList")
             .side(Side.CLIENT)
             .modid("enderio")
