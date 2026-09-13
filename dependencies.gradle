@@ -37,25 +37,25 @@ dependencies {
     // https://nexus.gtnewhorizons.com/service/rest/repository/browse/public/
 
     // Pure runtime
-    runtimeOnlyNonPublishable("com.github.GTNewHorizons:Hodgepodge:2.7.186:dev")
-    runtimeOnlyNonPublishable("com.github.GTNewHorizons:NotEnoughItems:2.8.122-GTNH:dev")
+    runtimeOnlyNonPublishable("com.github.GTNewHorizons:Hodgepodge:2.7.206:dev")
+    runtimeOnlyNonPublishable("com.github.GTNewHorizons:NotEnoughItems:2.8.139-GTNH:dev")
     runtimeOnlyNonPublishable("curse.maven:archaicfix-677782:6785842")
-    runtimeOnlyNonPublishable("com.github.GTNewHorizons:Angelica:2.2.3:dev")
-    runtimeOnlyNonPublishable("com.github.GTNewHorizons:GTNHLib:0.11.37:dev")
+    runtimeOnlyNonPublishable("com.github.GTNewHorizons:Angelica:2.2.13:dev")
+    runtimeOnlyNonPublishable("com.github.GTNewHorizons:GTNHLib:0.11.48:dev")
     runtimeOnlyNonPublishable("com.github.GTNewHorizons:GTNH-Web-Map:0.3.46:dev")
     runtimeOnlyNonPublishable("com.clear.clearmybackground:clearmybackground:1.0.4-1.7.10:dev")
 
     // Compilation + runtime
     devOnlyNonPublishable(rfg.deobf("curse.maven:catalogue-vintage-1465746:8384975")) // 1.0.8-1.7.10
     devOnlyNonPublishable("com.falsepattern:falsepatternlib-mc1.7.10:1.12.2:dev")
-    devOnlyNonPublishable("com.github.GTNewHorizons:ServerUtilities:2.4.6:dev")
+    devOnlyNonPublishable("com.github.GTNewHorizons:ServerUtilities:2.4.10:dev")
 
     // Pure compile
-    devOnlyNonPublishable("com.github.GTNewHorizons:ModularUI2:2.3.85-1.7.10:dev")
+    devOnlyNonPublishable("com.github.GTNewHorizons:ModularUI2:2.3.89-1.7.10:dev")
     compileOnly("org.jetbrains:annotations:26.1.0")
-    compileOnly("com.gtnewhorizons.retrofuturabootstrap:RetroFuturaBootstrap:1.0.16") { transitive = false }
-    compileOnly("com.github.GTNewHorizons:lwjgl3ify:3.0.31:dev")
-    compileOnly("org.lwjgl:lwjgl-sdl:3.4.2")
+    compileOnly("com.gtnewhorizons.retrofuturabootstrap:RetroFuturaBootstrap:1.1.2") { transitive = false }
+    compileOnly("com.github.GTNewHorizons:lwjgl3ify:3.0.33:dev")
+    compileOnly("org.lwjgl:lwjgl-sdl:3.4.3")
     compileOnly(rfg.deobf("curse.maven:endercore-231868:4671288")) // Hodgepodge already ports the mod menu, but FentLib still allows to modify both
     compileOnly(rfg.deobf("curse.maven:thaumcraft-223628:2227552")) {transitive=false}
     compileOnly(rfg.deobf("curse.maven:the-lord-of-the-rings-mod-legacy-423748:3646430"))
@@ -63,7 +63,7 @@ dependencies {
 
     // Shadow
     shadowCompile("me.saharnooby:qoi-java:1.2.1")
-    shadowCompile("com.twelvemonkeys.imageio:imageio-webp:3.14.0")
+    shadowCompile("com.twelvemonkeys.imageio:imageio-webp:3.15.0")
 
     // Disabled
     // api("club.heiqi:qz_fontrender:1.4.3:dev")
