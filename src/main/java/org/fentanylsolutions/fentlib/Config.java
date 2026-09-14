@@ -45,6 +45,7 @@ public class Config {
     public static boolean milkyPanorama = true;
     public static boolean terminalDepLoaderProgress = true;
     public static boolean fixEtFuturumBoatRendering = false;
+    public static boolean fixEntityDismembermentEmptyParts = true;
     public static boolean persistCataloguePreferences = true;
     public static CatalogueSortOrder catalogueSortOrder = CatalogueSortOrder.FAVOURITES_FIRST;
     public static boolean catalogueConfigsOnly = false;
@@ -198,6 +199,13 @@ public class Config {
                     + "Requires a restart.");
             fixEtFuturumBoatRenderingProperty.setRequiresMcRestart(true);
             fixEtFuturumBoatRendering = fixEtFuturumBoatRenderingProperty.getBoolean();
+
+            fixEntityDismembermentEmptyParts = config.getBoolean(
+                "fixEntityDismembermentEmptyParts",
+                Categories.miscTweaks,
+                true,
+                "Prevent Entity Dismemberment crashes on empty model parts, such as SmartMoving/SmartRender's "
+                    + "player joints. Skip empty parts while keeping their non-empty descendants.");
 
             loadCataloguePreferences();
 
