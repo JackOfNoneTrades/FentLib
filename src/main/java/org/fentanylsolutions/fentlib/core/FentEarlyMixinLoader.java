@@ -13,6 +13,7 @@ public abstract class FentEarlyMixinLoader implements IEarlyMixinLoader, IFMLLoa
 
     static {
         DepLoaderLaunchTransformer.registerEarly();
+        EtFuturumRedirectConflictCompat.registerEarly();
     }
 
     @Override
