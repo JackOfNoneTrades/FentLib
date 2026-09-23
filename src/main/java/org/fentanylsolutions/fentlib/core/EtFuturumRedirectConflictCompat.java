@@ -50,8 +50,7 @@ public final class EtFuturumRedirectConflictCompat implements IClassTransformer 
             "client.core.MixinMinecraft",
             "mixins.etfuturum.early.json",
             "MixinMinecraft_LoadingBridge",
-            "ArchaicFix's downloading-terrain screen hider vs EFR's world-thumbnail loading screen"),
-    };
+            "ArchaicFix's downloading-terrain screen hider vs EFR's world-thumbnail loading screen"), };
 
     private static final AtomicBoolean REGISTERED = new AtomicBoolean();
 
@@ -76,7 +75,8 @@ public final class EtFuturumRedirectConflictCompat implements IClassTransformer 
     @Override
     public byte[] transform(String name, String transformedName, byte[] basicClass) {
         // A timed hook, not a rewrite: retry on net.minecraft.* classes until the mixin configs have registered.
-        if (basicClass == null || decided.get() || transformedName == null
+        if (basicClass == null || decided.get()
+            || transformedName == null
             || !transformedName.startsWith("net.minecraft.")) {
             return basicClass;
         }
@@ -226,7 +226,8 @@ public final class EtFuturumRedirectConflictCompat implements IClassTransformer 
 
     private static String reflectName(Object target, String method) {
         try {
-            Method m = target.getClass().getMethod(method);
+            Method m = target.getClass()
+                .getMethod(method);
             Object result = m.invoke(target);
             return result == null ? null : result.toString();
         } catch (ReflectiveOperationException e) {

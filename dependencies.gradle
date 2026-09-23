@@ -45,7 +45,7 @@ dependencies {
     runtimeOnlyNonPublishable("com.clear.clearmybackground:clearmybackground:1.0.4-1.7.10:dev")
 
     // Compilation + runtime
-    devOnlyNonPublishable("com.github.GTNewHorizons:Angelica:2.2.18:dev")
+    devOnlyNonPublishable("com.github.GTNewHorizons:Angelica:2.2.19:dev")
     devOnlyNonPublishable(rfg.deobf("curse.maven:catalogue-vintage-1465746:8384975")) // 1.0.8-1.7.10
     devOnlyNonPublishable("com.falsepattern:falsepatternlib-mc1.7.10:1.12.2:dev")
     devOnlyNonPublishable("com.github.GTNewHorizons:ServerUtilities:2.4.13:dev")
