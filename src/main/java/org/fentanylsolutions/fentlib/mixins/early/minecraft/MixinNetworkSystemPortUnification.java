@@ -21,7 +21,8 @@ import io.netty.channel.Channel;
 @Mixin(targets = "net.minecraft.network.NetworkSystem$1")
 public abstract class MixinNetworkSystemPortUnification {
 
-    @Shadow(aliases = { "this$0", "field_151264_a" })
+    // Synthetic this$0 has no SRG mapping; skip remapping and match by alias.
+    @Shadow(remap = false, aliases = { "this$0", "field_151264_a" })
     @Final
     private NetworkSystem networkSystem;
 
