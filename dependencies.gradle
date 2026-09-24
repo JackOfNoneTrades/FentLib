@@ -38,7 +38,7 @@ dependencies {
 
     // Pure runtime
     runtimeOnlyNonPublishable("com.github.GTNewHorizons:Hodgepodge:2.7.211:dev")
-    runtimeOnlyNonPublishable("com.github.GTNewHorizons:NotEnoughItems:2.8.144-GTNH:dev")
+    runtimeOnlyNonPublishable("com.github.GTNewHorizons:NotEnoughItems:2.8.145-GTNH:dev")
     runtimeOnlyNonPublishable("curse.maven:archaicfix-677782:6785842")
     runtimeOnlyNonPublishable("com.github.GTNewHorizons:GTNHLib:0.11.51:dev")
     runtimeOnlyNonPublishable("com.github.GTNewHorizons:GTNH-Web-Map:0.3.46:dev")
